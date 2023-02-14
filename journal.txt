@@ -1,0 +1,32 @@
+14/02/23
+*Login is working as expected:
+    - Get data from the user.
+    - Confirme the entered ID is in the database.
+    - Opens Inventory.
+*Inventory GUI set:
+    - Tabs are done (Blanked) with their titles.
+    - User Tab entries and label are done. Need to be better presented.
+*User tab functionality:
+    - Data fetch and Insert in the database succesfully.
+
+## CHALLENGE of day(14/02/23):
+    To be able to open the SecondWindow(loginGUI_1.py) from the FirstWindow(inventoryGUI_2.py) both are in different
+modules. The challenge are:
+    - Step 1: Check if data is the BD (the check of the data happend in another module usersBD.py. This becasue I want
+        to manage the DB in separate modules for flexibility, easy to manage Class and Methods, and to reuse the code).
+        To be able to create the interaction I used a callback function, this allow the script to go to the next step.
+
+    - Step 2: Once data entered if confirmed instruct the program to open the SecondWindow that is in a different module
+        to transfer the Name and ID of the logged User. The transfer of the data is important because, in the the whole
+        loginGUI_1 module it will be used to register in the database the operations made by the logged User.
+        **Difficulty: SecondWindow Class has parameters to fetch data but data that no exist yet, the data will be given
+        by the FirstWindow.
+        With out parameter SecondWindow was given error because at the moment of inisialization it will need values.
+        Those wasn't there. After several tries and errors.
+        ***The solution: after a while that came up to me is to use *args that takes any number of values in __init__
+        and it wont requier any inmidate parameter at the moment of inisialize SecodWindow class.
+TODO
+    # Document and clean code in logingGUI_1.py
+    # Make more appeling the GUI of  login
+    # Check to set checkbutton btn_Admin desactivate by default
+    # fetch value from checkbutton
