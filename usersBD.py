@@ -66,12 +66,13 @@ class UserDb:
             sql = (f"SELECT * FROM _users WHERE user_id = '{_user_id}' AND user_first_name ='{_user_name}' ")
             # executing above query
             cursor.execute(sql)
-            result = cursor.fetchone()
+            self.result = cursor.fetchone()
             # If a result is returned, return True
             # if result[0] == int(_user_id) and result[1] == _user_name:
             print("BD.OK")
-            if result:
+            if self.result:
              callback(True)
+             return self.result
              print(str(result)+'dbOK')
             # If no result is returned, return False
             # else:
