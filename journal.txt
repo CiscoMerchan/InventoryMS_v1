@@ -25,7 +25,23 @@ modules. The challenge are:
         Those wasn't there. After several tries and errors.
         ***The solution: after a while that came up to me is to use *args that takes any number of values in __init__
         and it wont requier any inmidate parameter at the moment of inisialize SecodWindow class.
+
+15/02/23
+* Set treeviews for billing and items tabs
+
+Challange:
+    *Learn how it work the treeview widget with scrollbar and rendering the data inside the columns.
+    I started with the user tab to experiment which it was a bit confusing because I tried to do everything at the same
+    time. So I took a break and went for a swimming with the dog, in the river which was pretty nice. and then started
+    a new but in the billing tab to build the treeview and then to it as a blueprint and took it to Items tabs and
+    modifying for items.
+    **Difficulty: the most difficult it was to ask myself the right question to now what it was that I wated to achive.
+    **SolUtion: plan by writting down the goal and break it down to see a better picture of what Have to do.
+
+
 TODO
+    #Finish Item tabs and used as a blueprint for the other tabs that I just need to refactor varaibles,values,etc. Code
+    is the same.
     # Document and clean code in logingGUI_1.py
     # Make more appeling the GUI of  login
     # Check to set checkbutton btn_Admin desactivate by default
