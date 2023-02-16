@@ -38,10 +38,17 @@ Challange:
     **Difficulty: the most difficult it was to ask myself the right question to now what it was that I wated to achive.
     **SolUtion: plan by writting down the goal and break it down to see a better picture of what Have to do.
 
+16/02/23
+* Done Items, Supplier, Clients and Users frame with tabs and treeview
+* Added a Top frame to display data or  information
+* By creating a frame blueprint a review some Tkinter basic concepts: pack()(for buttons and labels in a frame widget)
+ and Frame widget.
+    *No real challenge today. Today it was more about rendering each tab using a a blueprint the ItemFrame
 
 TODO
+    # Add download button and column for image in item tab.
     #Finish Item tabs and used as a blueprint for the other tabs that I just need to refactor varaibles,values,etc. Code
-    is the same.
+    is the same. DONE for: items, supplier, clients and users.
     # Document and clean code in logingGUI_1.py
     # Make more appeling the GUI of  login
     # Check to set checkbutton btn_Admin desactivate by default
