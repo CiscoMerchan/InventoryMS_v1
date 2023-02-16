@@ -64,267 +64,435 @@ class SecondWindow:
 ################################ NoteBooK##################
         self.notebook = ttk.Notebook(self.window) #width = 950, height = 450
         # this lb_title is just to check that the value entered by the user in loginGUI_1 module is transfered to this module
+        # And to include label to render information to the user
         lb_title = ttk.Label(root,text=f'welcome{self.user_name}, ID: {self.user_id}')
         lb_title.pack()
         lb_title1 = ttk.Label(root, text=f'welcome{self.user_name}, ID: {self.user_id}')
         lb_title1.pack()
-        lb_title2 = ttk.Label(root, text=f'welcome{self.user_name}, ID: {self.user_id}')
-        lb_title2.pack()
-        lb_title3 = ttk.Label(root, text=f'welcome{self.user_name}, ID: {self.user_id}')
-        lb_title3.pack()
-        lb_title4 = ttk.Label(root, text=f'welcome{self.user_name}, ID: {self.user_id}')
-        lb_title4.pack()
-        lb_title5 = ttk.Label(root, text=f'welcome{self.user_name}, ID: {self.user_id}')
-        lb_title5.pack()
+        # lb_title2 = ttk.Label(root, text=f'welcome{self.user_name}, ID: {self.user_id}')
+        # lb_title2.pack()
+        # lb_title3 = ttk.Label(root, text=f'welcome{self.user_name}, ID: {self.user_id}')
+        # lb_title3.pack()
+        # lb_title4 = ttk.Label(root, text=f'welcome{self.user_name}, ID: {self.user_id}')
+        # lb_title4.pack()
+        # lb_title5 = ttk.Label(root, text=f'welcome{self.user_name}, ID: {self.user_id}')
+        # lb_title5.pack()
         #Frames by Categories
         """BILLING"""
        
         ##################
-        itemFrame = ttk.Frame(self.notebook)
-        itemTab = ttk.Frame(itemFrame)
-        itemTab.pack(side=tkinter.LEFT)
-        itemTreeview = ttk.Frame(itemFrame)
-        itemTreeview.pack(side=tkinter.LEFT)
-        
-        ######################## BILLING TREEVIEW
-        item_tree = ttk.Treeview(itemTreeview, height = 20 ,columns=(1, 2, 3, 4), show="headings")
-        item_tree.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
-        item_tree_scroll = ttk.Scrollbar(itemTreeview, orient="vertical", command=item_tree.yview)
-        item_tree_scroll.pack(side=tkinter.LEFT, fill=tkinter.Y)
-        item_tree.configure(yscrollcommand=item_tree_scroll.set)
-        item_tree.heading(1, text="Column 1")
-        item_tree.heading(2, text="Column 2")
-        item_tree.heading(3, text="Column 3")
-        item_tree.heading(4, text="Column 4")
-        ################################# BILLING TAB ENTRIES
-        lb_ItemCode = ttk.Label(itemTab, text="Label 1")
-        lb_ItemCode.pack()
-        self.itemCodeEntry = ttk.Entry(itemTab)
-        self.itemCodeEntry.pack()
-        billing_left_frame_label2 = ttk.Label(itemTab, text="Label 2")
-        billing_left_frame_label2.pack()
-        billing_left_frame_entry2 = ttk.Entry(itemTab)
-        billing_left_frame_entry2.pack()
-        billing_left_frame_label3 = ttk.Label(itemTab, text="Label 3")
-        billing_left_frame_label3.pack()
-        billing_left_frame_entry3 = ttk.Entry(itemTab)
-        billing_left_frame_entry3.pack()
-        billing_left_frame_button1 = ttk.Button(itemTab, text="Button 1")
-        billing_left_frame_button1.pack()
-        billing_left_frame_button2 = ttk.Button(itemTab, text="Button 2")
-        billing_left_frame_button2.pack()
-        billing_left_frame_button3 = ttk.Button(itemTab, text="Button 3")
-        billing_left_frame_button3.pack()
-        self.notebook.add(itemFrame, text="Billing")
+        # itemFrame = ttk.Frame(self.notebook)
+        # itemTab = ttk.Frame(itemFrame)
+        # itemTab.pack(side=tkinter.LEFT)
+        # itemTreeview = ttk.Frame(itemFrame)
+        # itemTreeview.pack(side=tkinter.LEFT)
+        #
+        # ######################## BILLING TREEVIEW
+        # item_tree = ttk.Treeview(itemTreeview, height = 20 ,columns=(1, 2, 3, 4), show="headings")
+        # item_tree.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
+        # ### SCROLLBAR
+        # item_tree_scroll = ttk.Scrollbar(itemTreeview, orient="vertical", command=item_tree.yview)
+        # item_tree_scroll.pack(side=tkinter.LEFT, fill=tkinter.Y)
+        # item_tree.configure(yscrollcommand=item_tree_scroll.set)
+        # item_tree.heading(1, text="Column 1")
+        # item_tree.heading(2, text="Column 2")
+        # item_tree.heading(3, text="Column 3")
+        # item_tree.heading(4, text="Column 4")
+        # ################################# BILLING TAB ENTRIES
+        # lb_ItemCode = ttk.Label(itemTab, text="Label 1")
+        # lb_ItemCode.pack()
+        # self.itemCodeEntry = ttk.Entry(itemTab)
+        # self.itemCodeEntry.pack()
+        # lb_ItemName = ttk.Label(itemTab, text="Label 2")
+        # lb_ItemName.pack()
+        # billing_left_frame_entry2 = ttk.Entry(itemTab)
+        # billing_left_frame_entry2.pack()
+        # lb_ItemDescription = ttk.Label(itemTab, text="Label 3")
+        # lb_ItemDescription.pack()
+        # itemDescriptionEntry = ttk.Entry(itemTab)
+        # itemDescriptionEntry.pack()
+        # billing_left_frame_button1 = ttk.Button(itemTab, text="Button 1")
+        # billing_left_frame_button1.pack()
+        # btn_UpdateItem = ttk.Button(itemTab, text="Button 2")
+        # btn_UpdateItem.pack()
+        # btn_ItemShow = ttk.Button(itemTab, text="Button 3")
+        # btn_ItemShow.pack()
+        # self.notebook.add(itemFrame, text="Billing")
 
 ###################################################################
         """ITEMS"""
-
+        #### MAIN FRAME ######################################################################
         itemFrame = ttk.Frame(self.notebook)
-        itemTab = ttk.Frame(itemFrame) 
+        ##### TOP FRAME FOR LABELS (RENDER INFORMATION  #######################################
+        itemTopTab = ttk.Frame(itemFrame)
+        itemTopTab.pack(side=tkinter.TOP)
+        #### LEFT FRAME FOR THE ENTRIES, LABELS AND BUTTONS ###############################
+        itemTab = ttk.Frame(itemFrame)
         itemTab.pack(side=tkinter.LEFT)
+        #### RIGHT FRAME FOR TREEVIEW AND SCROLLBAR ############################################
         itemTreeview = ttk.Frame(itemFrame)
-        itemTreeview.pack(side=tkinter.LEFT) 
- ###############test insert in treeview
-        itemlist= ('345454', "object", "supplier", 100, f"${20}", 5, "level 1")
+        itemTreeview.pack(side=tkinter.RIGHT)
+###### TEST For Labels at the top of the treevieww to render information#########
+        lb_title = ttk.Label(itemTopTab, text='Itemfgsf Name')
+        lb_title.pack()
+        lb_title = ttk.Label(itemTopTab, text='Itemfgsf ')
+        lb_title.pack(side=tkinter.RIGHT,padx=10)
+        lb_title = ttk.Label(itemTopTab, text=' Name')
+        lb_title.pack(side=tkinter.LEFT, padx=10)
+        lb_title = ttk.Label(itemTopTab, text='Item Name')
+        lb_title.pack(padx=10)
+        #####################################################
+        ###############test insert in treeview
+        lis = []
+        for i in range(1,50):
+            itemlist = (f'{i}', "object", "Object to create objects", "supplier", 100+(i*4), f"${2+i}", 5*i, "level 1")
+            lis.append(itemlist)
+        print(lis)
         # item_tree.insert('','end', text=itemlist[0], values=itemlist[0:])
         ######################## ITEM TREEVIEW
-        item_tree = ttk.Treeview(itemTreeview, height=20, columns=("Code", "Name","Supplier", "Quantity","Price","Min. Stock", "Location"), show="headings")
-        item_tree.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
-        item_tree.insert('', 'end', text=itemlist[0], values=itemlist[0:])   # Insert data into the treeview
 
+        item_tree = ttk.Treeview(itemTreeview, height=18, columns=("Item Code", "Name", "Description","Supplier", "Quantity","Price","Min. Stock", "Location"), show="headings")
+        item_tree.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
+        # item_tree.insert('', 'end', text=itemlist[0], values=lis[0:])   # Insert data into the treeview
+        for row in lis:
+                item_tree.insert('', 'end', values=row)#  test Insert data into the treeview
         #Scrollbar for the treeview
         item_tree_scroll = ttk.Scrollbar(itemTreeview, orient="vertical", command=item_tree.yview)
         item_tree_scroll.pack(side=tkinter.LEFT, fill=tkinter.Y)
         item_tree.configure(yscrollcommand=item_tree_scroll.set)
-
-        item_tree.heading(0, text="Code", anchor='center')
+        ##### Heading of the treeview
+        item_tree.heading(0, text="Item Code", anchor='center')
         item_tree.heading(1, text="Name", anchor='center')
-        item_tree.heading(2, text="Supplier", anchor='center')
-        item_tree.heading(3, text="Quantity", anchor='center')
-        item_tree.heading(4, text="Price", anchor='center')
-        item_tree.heading(5, text="Min. Stock", anchor='center')
-        item_tree.heading(6, text="Location", anchor='center')
-        item_tree.column(0, width=100, anchor='center')
-        item_tree.column(1, width=100, anchor='center')
-        item_tree.column(2, width=100, anchor='center')
-        item_tree.column(3, width=100, anchor='center')
+        item_tree.heading(2, text="Description", anchor='center')
+        item_tree.heading(3, text="Supplier ID", anchor='center')
+        item_tree.heading(4, text="Quantity", anchor='center')
+        item_tree.heading(5, text="Price", anchor='center')
+        item_tree.heading(6, text="Min. Stock", anchor='center')
+        item_tree.heading(7, text="Location", anchor='center')
+        ##### Columns of the treeview
+        item_tree.column(0, width=150, anchor='center')
+        item_tree.column(1, width=150, anchor='center')
+        item_tree.column(2, width=300, anchor='center')
+        item_tree.column(3, width=150, anchor='center')
         item_tree.column(4, width=100, anchor='center')
         item_tree.column(5, width=100, anchor='center')
         item_tree.column(6, width=100, anchor='center')
+        item_tree.column(2, width=150, anchor='center')
 
-        ################################# ITEMS TAB ENTRIES
-        lb_ItemCode = ttk.Label(itemTab, text="Code:")
+        ################################# ITEMS TAB, LABELS AND ENTRIES
+        lb_ItemCode = ttk.Label(itemTab, text="Item Code:")
         lb_ItemCode.pack()
         self.itemCodeEntry = ttk.Entry(itemTab)
         self.itemCodeEntry.pack()
-        billing_left_frame_label2 = ttk.Label(itemTab, text="Label 2")
-        billing_left_frame_label2.pack()
-        billing_left_frame_entry2 = ttk.Entry(itemTab)
-        billing_left_frame_entry2.pack()
-        billing_left_frame_label3 = ttk.Label(itemTab, text="Label 3")
-        billing_left_frame_label3.pack()
-        billing_left_frame_entry3 = ttk.Entry(itemTab)
-        billing_left_frame_entry3.pack()
-        billing_left_frame_button1 = ttk.Button(itemTab, text="Button 1")
-        billing_left_frame_button1.pack()
-        billing_left_frame_button2 = ttk.Button(itemTab, text="Button 2")
-        billing_left_frame_button2.pack()
-        billing_left_frame_button3 = ttk.Button(itemTab, text="Button 3")
-        billing_left_frame_button3.pack()
+        lb_ItemName = ttk.Label(itemTab, text="Name:")
+        lb_ItemName.pack()
+        self.itemNameEntry = ttk.Entry(itemTab)
+        self.itemNameEntry.pack()
+        lb_ItemDescription = ttk.Label(itemTab, text="Description")
+        lb_ItemDescription.pack()
+        self.itemDescriptionEntry = ttk.Entry(itemTab)
+        self.itemDescriptionEntry.pack()
+        lb_ItemDescription = ttk.Label(itemTab, text="Description")
+        lb_ItemDescription.pack()
+        self.itemDescriptionEntry = ttk.Entry(itemTab)
+        self.itemDescriptionEntry.pack()
+        lb_ItemSupplierId = ttk.Label(itemTab, text="Supplier ID:")
+        lb_ItemSupplierId.pack()
+        self.itemSupplierIdEntry = ttk.Entry(itemTab)
+        self.itemSupplierIdEntry.pack()
+        lb_ItemQuantity = ttk.Label(itemTab, text="Quantity:")
+        lb_ItemQuantity.pack()
+        self.itemQuantityEntry = ttk.Entry(itemTab)
+        self.itemQuantityEntry.pack()
+        lb_ItemPrice = ttk.Label(itemTab, text="Price:")
+        lb_ItemPrice.pack()
+        self.itemPriceEntry = ttk.Entry(itemTab)
+        self.itemPriceEntry.pack()
+        lb_ItemMinStock = ttk.Label(itemTab, text="Min. Stock")
+        lb_ItemMinStock.pack()
+        self.itemMinStockEntry = ttk.Entry(itemTab)
+        self.itemMinStockEntry.pack()
+        lb_ItemLocation = ttk.Label(itemTab, text="Location:")
+        lb_ItemLocation.pack()
+        self.itemLocationEntry = ttk.Entry(itemTab)
+        self.itemLocationEntry.pack()
+
+        ###BUTTONS
+        btn_InsertItem = ttk.Button(itemTab, text="Insert")
+        btn_InsertItem.pack()
+        btn_UpdateItem = ttk.Button(itemTab, text="Update")
+        btn_UpdateItem.pack(side=tkinter.RIGHT)
+        btn_ItemShow = ttk.Button(itemTab, text="Show")
+        btn_ItemShow.pack()
         self.notebook.add(itemFrame, text="Items")
 
 
 
 
 ##################################################################################
-        frameSupplier = ttk.Frame(self.notebook)
-        lb_frameSupplier = ttk.Label(frameSupplier, text="Supplier")
-        lb_frameSupplier.pack(padx=5, pady=5)
-        frameSupplier.pack(expand=1,fill="both")
+        """SUPPLIERS"""
 
+        #### MAIN FRAME ######################################################################
+        supplierFrame = ttk.Frame(self.notebook)
+        ##### TOP FRAME FOR LABELS (RENDER INFORMATION  #######################################
+        supplierTopTab = ttk.Frame(supplierFrame)
+        supplierTopTab.pack(side=tkinter.TOP)
+        #### LEFT FRAME FOR THE ENTRIES, LABELS AND BUTTONS ###############################
+        supplierTab = ttk.Frame(supplierFrame)
+        supplierTab.pack(side=tkinter.LEFT)
+        #### RIGHT FRAME FOR TREEVIEW AND SCROLLBAR ############################################
+        supplierTreeview = ttk.Frame(supplierFrame)
+        supplierTreeview.pack(side=tkinter.RIGHT)
+        ###### TEST For Labels at the top of the treevieww to render information#########
+        lb_title = ttk.Label(supplierTopTab, text='Itemfgsf Name')
+        lb_title.pack()
+        lb_title = ttk.Label(supplierTopTab, text='Itemfgsf ')
+        lb_title.pack(side=tkinter.RIGHT, padx=10)
+        lb_title = ttk.Label(supplierTopTab, text=' Name')
+        lb_title.pack(side=tkinter.LEFT, padx=10)
+        lb_title = ttk.Label(supplierTopTab, text='Item Name')
+        lb_title.pack(padx=10)
+        #####################################################
+        ###############test insert in treeview
+        lis = []
+        for i in range(1, 50):
+            suplist = (
+            25*i, f"Company {i}", f"Name {i}", i*45, f"email{i}")
+            lis.append(suplist)
+        print(lis)
+        # supplier_tree.insert('','end', text=itemlist[0], values=itemlist[0:])
+        ######################## ITEM TREEVIEW
+
+        supplier_tree = ttk.Treeview(supplierTreeview, height=18, columns=(
+         "Supplier ID", "Company Name", "Agent", "Telephone", "Email"), show="headings")
+        supplier_tree.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
+        # supplier_tree.insert('', 'end', text=itemlist[0], values=lis[0:])   # Insert data into the treeview
+        for row in lis:
+            supplier_tree.insert('', 'end', values=row)  # test Insert data into the treeview
+        # Scrollbar for the treeview
+        supplier_tree_scroll = ttk.Scrollbar(supplierTreeview, orient="vertical", command=supplier_tree.yview)
+        supplier_tree_scroll.pack(side=tkinter.LEFT, fill=tkinter.Y)
+        supplier_tree.configure(yscrollcommand=supplier_tree_scroll.set)
+        ##### Heading of the treeview
+        supplier_tree.heading(0, text="Supplier ID", anchor='center')
+        supplier_tree.heading(1, text="Company Name", anchor='center')
+        supplier_tree.heading(2, text="Agent", anchor='center')
+        supplier_tree.heading(3, text="Telephone", anchor='center')
+        supplier_tree.heading(4, text="Email", anchor='center')
+
+        ##### Columns of the treeview
+        supplier_tree.column(0, width=150, anchor='center')
+        supplier_tree.column(1, width=300, anchor='center')
+        supplier_tree.column(2, width=300, anchor='center')
+        supplier_tree.column(3, width=100, anchor='center')
+        supplier_tree.column(4, width=250, anchor='center')
+
+
+        ################################# SUPPLIERS TAB, LABELS AND ENTRIES
+
+        lb_SupplierId = ttk.Label(supplierTab, text="Supplier ID:")
+        lb_SupplierId.pack()
+        self.supplierIdEntry = ttk.Entry(supplierTab)
+        self.supplierIdEntry.pack()
+        lb_SupplierName = ttk.Label(supplierTab, text="Company Name:")
+        lb_SupplierName.pack()
+        self.supplierNameEntry = ttk.Entry(supplierTab)
+        self.supplierNameEntry.pack()
+        lb_SupplierAgent = ttk.Label(supplierTab, text="Agent Full Name:")
+        lb_SupplierAgent.pack()
+        self.supplierAgentEntry = ttk.Entry(supplierTab)
+        self.supplierAgentEntry.pack()
+        lb_SupplierTelephone = ttk.Label(supplierTab, text="Telephone:")
+        lb_SupplierTelephone.pack()
+        self.supplierTelephoneEntry = ttk.Entry(supplierTab)
+        self.supplierTelephoneEntry.pack()
+        lb_SupplierEmail = ttk.Label(supplierTab, text="Email:")
+        lb_SupplierEmail.pack()
+        self.supplierEmailEntry = ttk.Entry(supplierTab)
+        self.supplierEmailEntry.pack()
+
+        ###BUTTONS
+        btn_InsertSupplier = ttk.Button(supplierTab, text="Insert", command="")
+        btn_InsertSupplier.pack()
+        btn_UpdateSupplier = ttk.Button(supplierTab, text="Update", command="")
+        btn_UpdateSupplier.pack(side=tkinter.RIGHT)
+        btn_SupplierShow = ttk.Button(supplierTab, text="Show", command="")
+        btn_SupplierShow.pack()
+        self.notebook.add(supplierFrame, text="Supplier")
 #######################################################################
         """CLIENT"""
-        frameClient = ttk.Frame(self.notebook)
-        lb_frameClient = ttk.Label(frameClient, text="Client")
-        lb_frameClient.pack(padx = 5, pady =5)
-        frameClient.pack(expand=1,fill="both")
+
+        #### MAIN FRAME ######################################################################
+        clientFrame = ttk.Frame(self.notebook)
+        ##### TOP FRAME FOR LABELS (RENDER INFORMATION  #######################################
+        clientTopTab = ttk.Frame(clientFrame)
+        clientTopTab.pack(side=tkinter.TOP)
+        #### LEFT FRAME FOR THE ENTRIES, LABELS AND BUTTONS ###############################
+        clientTab = ttk.Frame(clientFrame)
+        clientTab.pack(side=tkinter.LEFT)
+        #### RIGHT FRAME FOR TREEVIEW AND SCROLLBAR ############################################
+        clientTreeview = ttk.Frame(clientFrame)
+        clientTreeview.pack(side=tkinter.RIGHT)
+        ###### TEST For Labels at the top of the treevieww to render information#########
+        lb_title = ttk.Label(clientTopTab, text='Itemfgsf Name')
+        lb_title.pack()
+        lb_title = ttk.Label(clientTopTab, text='Itemfgsf ')
+        lb_title.pack(side=tkinter.RIGHT, padx=10)
+        lb_title = ttk.Label(clientTopTab, text=' Name')
+        lb_title.pack(side=tkinter.LEFT, padx=10)
+        lb_title = ttk.Label(clientTopTab, text='Item Name')
+        lb_title.pack(padx=10)
+        #####################################################
+        ###############test insert in treeview
+        lis = []
+        for i in range(1, 50):
+            suplist = (
+            25*i, f"Company {i}", f"Name {i}", i*45, f"email{i}")
+            lis.append(suplist)
+        print(lis)
+        # client_tree.insert('','end', text=itemlist[0], values=itemlist[0:])
+        ######################## ITEM TREEVIEW
+
+        client_tree = ttk.Treeview(clientTreeview, height=18, columns=(
+         "Client ID", "Company Name", "Agent", "Telephone", "Email"), show="headings")
+        client_tree.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
+        # client_tree.insert('', 'end', text=itemlist[0], values=lis[0:])   # Insert data into the treeview
+        for row in lis:
+            client_tree.insert('', 'end', values=row)  # test Insert data into the treeview
+        # Scrollbar for the treeview
+        client_tree_scroll = ttk.Scrollbar(clientTreeview, orient="vertical", command=client_tree.yview)
+        client_tree_scroll.pack(side=tkinter.LEFT, fill=tkinter.Y)
+        client_tree.configure(yscrollcommand=client_tree_scroll.set)
+        ##### Heading of the treeview
+        client_tree.heading(0, text="Client ID", anchor='center')
+        client_tree.heading(1, text="Company Name", anchor='center')
+        client_tree.heading(2, text="Agent", anchor='center')
+        client_tree.heading(3, text="Telephone", anchor='center')
+        client_tree.heading(4, text="Email", anchor='center')
+
+        ##### Columns of the treeview
+        client_tree.column(0, width=150, anchor='center')
+        client_tree.column(1, width=300, anchor='center')
+        client_tree.column(2, width=300, anchor='center')
+        client_tree.column(3, width=100, anchor='center')
+        client_tree.column(4, width=250, anchor='center')
+
+
+        ################################# CLIENTS TAB, LABELS AND ENTRIES
+
+        lb_SupplierId = ttk.Label(clientTab, text="Supplier ID:")
+        lb_SupplierId.pack()
+        self.clientIdEntry = ttk.Entry(clientTab)
+        self.clientIdEntry.pack()
+        lb_SupplierName = ttk.Label(clientTab, text="Company Name:")
+        lb_SupplierName.pack()
+        self.clientNameEntry = ttk.Entry(clientTab)
+        self.clientNameEntry.pack()
+        lb_SupplierAgent = ttk.Label(clientTab, text="Agent Full Name:")
+        lb_SupplierAgent.pack()
+        self.clientAgentEntry = ttk.Entry(clientTab)
+        self.clientAgentEntry.pack()
+        lb_SupplierTelephone = ttk.Label(clientTab, text="Telephone:")
+        lb_SupplierTelephone.pack()
+        self.clientTelephoneEntry = ttk.Entry(clientTab)
+        self.clientTelephoneEntry.pack()
+        lb_SupplierEmail = ttk.Label(clientTab, text="Email:")
+        lb_SupplierEmail.pack()
+        self.clientEmailEntry = ttk.Entry(clientTab)
+        self.clientEmailEntry.pack()
+
+        ###BUTTONS
+        btn_InsertSupplier = ttk.Button(clientTab, text="Insert", command="")
+        btn_InsertSupplier.pack()
+        btn_UpdateSupplier = ttk.Button(clientTab, text="Update", command="")
+        btn_UpdateSupplier.pack(side=tkinter.RIGHT)
+        btn_SupplierShow = ttk.Button(clientTab, text="Show", command="")
+        btn_SupplierShow.pack()
+        self.notebook.add(clientFrame, text="Client")
 
 ###############################################################
         """USER"""
-###################### USER TABS##########################
-        # frameUser = ttk.Frame(self.notebook)
-        # #Label and entry
-        # lb_Title = ttk.Labelframe(frameUser,text= "User")
-        # lb_Title.grid(row=0)
-#         lb_UserName = ttk.Label(frameUser, text="* Name:", font=LABELS)
-#         lb_UserName.grid(row=1)#pack(padx=15, pady=5, anchor='w')
-#         self.userNameEntry = ttk.Entry(frameUser, textvariable="Name")
-#         self.userNameEntry.grid(row=2)#pack( padx=15, pady=5,anchor='w')
-#         lb_UserLastName = ttk.Label(frameUser, text="* Lastname:", font=LABELS)
-#         lb_UserLastName.grid(row=3) # pack(padx=15, pady=5, anchor='w')
-#         self.userLastNameEntry = ttk.Entry(frameUser, textvariable="LastName")
-#         self.userLastNameEntry.grid(row=4)#pack(padx=15, pady=5, anchor='w')
-#         lb_UserEmail = ttk.Label(frameUser, text="Email:", font=LABELS)
-#         lb_UserEmail.grid(row=5) # pack(padx=15, pady=5, anchor='w')
-#         self.userEmailEntry = ttk.Entry(frameUser, textvariable="Email")
-#         self.userEmailEntry.grid(row=6) #pack(padx=15, pady=5, anchor='w')
-#         lb_Mandatory = ttk.Label(frameUser, text="* case madatory", font=('',8,'bold'))
-#         lb_Mandatory.grid(row=7)#pack(padx=15, pady=5, anchor='w')
-#         self.cb_Admin = ttk.Checkbutton(frameUser,text='Admin', variable="Admin", onvalue=1, offvalue = 0)
-#         self.cb_Admin.grid(row=8) #.pack(padx=15, pady=5, anchor='w')
-#         CreateToolTip(self.cb_Admin, text=' \n If new user will be part of Admin check the box \n')
-#         btn_Insert = ttk.Button(frameUser,text='Insert', command= lambda : self.insert_user_data())
-#         btn_Insert.grid(row=9, column=0)
-#         btn_Show = ttk.Button(frameUser, text='Show')
-#         btn_Show.grid(row=9, column=1)
-#         btn_Update = ttk.Button(frameUser, text='Update')
-#         btn_Update.grid(row=10, column=0, columnspan= 2)
-#
-#
-#         frameUser.pack(expand=1,fill="both")
-#
-# ####################### USER TREE VIEW   ####################################################
-#         tabUser = ttk.Notebook(self.window)
-#         userTree = ttk.Frame(tabUser)
-#
-#         userTitle = ttk.Labelframe(frameUser, text="Users", borderwidth=3)
-#         frameUser.grid_propagate(0)
-#         userTitle.grid(row=0,column=1,padx=8,pady=4,sticky="N")
-#         userTree.grid_anchor(anchor='center')
-#         # ************************************ TREE VIEW *******************************************
-#
-#         tree = ttk.Treeview(frameUser, columns=('Item', 'ID', 'Name', 'last Name', 'Email', 'Quantity'), height=20)
-#         tree.place(x=30, y=95)
-#         vsb = ttk.Scrollbar(tree, orient="vertical", command=tree.yview)
-#         vsb.place(x=60 + 1000 + 5, y=0, height=200 + 220, bordermode='outside')
-#
-#         tree.configure(yscrollcommand=vsb.set)
-#         tree.heading('#0', text='Users')
-#         tree.heading('#1', text='ID')
-#         tree.heading('#2', text='Name')
-#         tree.heading('#3', text='Last Name')
-#         tree.heading('#4', text='Email')
-#         tree.heading('#5', text='Level')
-#         tree.column('#1', stretch=tkinter.YES)
-#         tree.column('#2', stretch=tkinter.YES)
-#         tree.column('#0', stretch=tkinter.YES)
-#         tree.column('#3', stretch=tkinter.YES)
-#         tree.column('#4', stretch=tkinter.YES)
-#         tree.column('#5', stretch=tkinter.YES)
-#         tree.grid(row=11, columnspan=4, sticky='nsew')
-#         # tabcontrol1.pack(expand=0, fill="both")
-#         frameUser.pack(expand=1, fill="both")
 
-        #### TEST
+        #### MAIN FRAME ######################################################################
+        userFrame = ttk.Frame(self.notebook)
+        ##### TOP FRAME FOR LABELS (RENDER INFORMATION  #######################################
+        userTopTab = ttk.Frame(userFrame)
+        userTopTab.pack(side=tkinter.TOP)
+        #### LEFT FRAME FOR THE ENTRIES, LABELS AND BUTTONS ###############################
+        userTab = ttk.Frame(userFrame)
+        userTab.pack(side=tkinter.LEFT)
+        #### RIGHT FRAME FOR TREEVIEW AND SCROLLBAR ############################################
+        userTreeview = ttk.Frame(userFrame)
+        userTreeview.pack(side=tkinter.RIGHT)
+        ###### TEST For Labels at the top of the treevieww to render information#########
+        lb_title = ttk.Label(userTopTab, text='Itemfgsf Name')
+        lb_title.pack()
+        lb_title = ttk.Label(userTopTab, text='Itemfgsf ')
+        lb_title.pack(side=tkinter.RIGHT, padx=10)
+        lb_title = ttk.Label(userTopTab, text=' Name')
+        lb_title.pack(side=tkinter.LEFT, padx=10)
+        lb_title = ttk.Label(userTopTab, text='Item Name')
+        lb_title.pack(padx=10)
+        #####################################################
+        ###############test insert in treeview
+        lis = []
+        for i in range(1, 50):
+            suplist = (
+                 i, f"Name {i}", f"Last Name {i}",f"email{i}")
+            lis.append(suplist)
+        print(lis)
+        # user_tree.insert('','end', text=itemlist[0], values=itemlist[0:])
+        ######################## ITEM TREEVIEW
 
-        # frameUser = ttk.Frame(self.notebook)
-        #
-        # # Label and entry
-        # lb_Title = ttk.Labelframe(frameUser, text="User")
-        # lb_Title.grid(row=0, column=0, sticky='nsew')
-        #
-        # lb_UserName = ttk.Label(frameUser, text="* Name:", font=LABELS)
-        # lb_UserName.grid(row=1, column=0)
-        # self.userNameEntry = ttk.Entry(frameUser, textvariable="Name")
-        # self.userNameEntry.grid(row=2, column=0)
-        #
-        # lb_UserLastName = ttk.Label(frameUser, text="* Lastname:", font=LABELS)
-        # lb_UserLastName.grid(row=3, column=0)
-        # self.userLastNameEntry = ttk.Entry(frameUser, textvariable="LastName")
-        # self.userLastNameEntry.grid(row=4, column=0)
-        #
-        # lb_UserEmail = ttk.Label(frameUser, text="Email:", font=LABELS)
-        # lb_UserEmail.grid(row=5, column=0)
-        # self.userEmailEntry = ttk.Entry(frameUser, textvariable="Email")
-        # self.userEmailEntry.grid(row=6, column=0)
-        #
-        # lb_Mandatory = ttk.Label(frameUser, text="* case mandatory", font=('', 8, 'bold'))
-        # lb_Mandatory.grid(row=7, column=0)
-        # self.cb_Admin = ttk.Checkbutton(frameUser, text='Admin', variable="Admin", onvalue=1, offvalue=0)
-        # self.cb_Admin.grid(row=8, column=0)
-        # CreateToolTip(self.cb_Admin, text=' \n If new user will be part of Admin check the box \n')
-        #
-        # btn_Insert = ttk.Button(frameUser, text='Insert', command=lambda: self.insert_user_data())
-        # btn_Insert.grid(row=9, column=0)
-        # btn_Show = ttk.Button(frameUser, text='Show')
-        # btn_Show.grid(row=9, column=1)
-        # btn_Update = ttk.Button(frameUser, text='Update')
-        # btn_Update.grid(row=10, column=0, columnspan=2)
-        #
-        # ##
-        # tabUser = ttk.Notebook(self.window)
-        #
-        # userTreeView = ttk.Frame(tabUser)
-        # tabUser.add(userTreeView, text="Users")
-        # tabUser.pack(side="left", fill="both", expand=True)
-        #
-        # userTitle = ttk.Labelframe(userTreeView, text="Users")
-        # userTitle.grid(row=0, column=0, sticky='nsew')
-        #
-        # tree = ttk.Treeview(userTreeView, columns=('Item', 'ID', 'Name', 'Last Name', 'Email', 'Level'))
-        # tree.grid(row=1, column=0, sticky='nsew')
-        #
-        # # tree.heading('#0', text='Users')
-        # tree.heading('#0', text='ID')
-        # tree.heading('#1', text='Name')
-        # tree.heading('#2', text='Last Name')
-        # tree.heading('#3', text='Email')
-        # tree.heading('#4', text='Level')
-        #
-        # tree.column('#1', stretch=tkinter.YES)
-        # tree.column('#2', stretch=tkinter.YES)
-        # tree.column('#0', stretch=tkinter.YES)
-        # tree.column('#3', stretch=tkinter.YES)
-        # tree.column('#4', stretch=tkinter.YES)
-        # # tree.column('#5', stretch=tkinter.YES)
-        #
-        # # Add vertical scrollbar
-        # vsb = ttk.Scrollbar(userTreeView, orient="vertical", command=tree.yview)
-        # vsb.grid(row=1, column=1, sticky='ns')
-        # tree.configure(yscrollcommand=vsb.set)
+        user_tree = ttk.Treeview(userTreeview, height=18, columns=(
+            "User ID", "Name", "Last Name", "Email"), show="headings")
+        user_tree.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
+        # user_tree.insert('', 'end', text=itemlist[0], values=lis[0:])   # Insert data into the treeview
+        for row in lis:
+            user_tree.insert('', 'end', values=row)  # test Insert data into the treeview
+        # Scrollbar for the treeview
+        user_tree_scroll = ttk.Scrollbar(userTreeview, orient="vertical", command=user_tree.yview)
+        user_tree_scroll.pack(side=tkinter.LEFT, fill=tkinter.Y)
+        user_tree.configure(yscrollcommand=user_tree_scroll.set)
+        ##### Heading of the treeview
+        user_tree.heading(0, text="User ID", anchor='center')
+        user_tree.heading(1, text="Name", anchor='center')
+        user_tree.heading(2, text="Last Name", anchor='center')
+        user_tree.heading(3, text="Email", anchor='center')
 
-        ###########################################################################
+        ##### Columns of the treeview
+        user_tree.column(0, width=150, anchor='center')
+        user_tree.column(1, width=300, anchor='center')
+        user_tree.column(2, width=300, anchor='center')
+        user_tree.column(3, width=350, anchor='center')
+
+
+        ################################# CLIENTS TAB, LABELS AND ENTRIES
+
+        lb_UserName = ttk.Label(userTab, text="Name:")
+        lb_UserName.pack()
+        self.userNameEntry = ttk.Entry(userTab)
+        self.userNameEntry.pack()
+        lb_SupplierName = ttk.Label(userTab, text="Last Name:")
+        lb_SupplierName.pack()
+        self.userLastNameEntry = ttk.Entry(userTab)
+        self.userLastNameEntry.pack()
+        lb_UserEmail = ttk.Label(userTab, text="Email:")
+        lb_UserEmail.pack()
+        self.userEmailEntry = ttk.Entry(userTab)
+        self.userEmailEntry.pack()
+
+
+        ###BUTTONS
+        btn_InsertUser = ttk.Button(userTab, text="Insert", command="")
+        btn_InsertUser.pack()
+        btn_UpdateUser = ttk.Button(userTab, text="Update", command="")
+        btn_UpdateUser.pack(side=tkinter.RIGHT)
+        btn_UserShow = ttk.Button(userTab, text="Show", command="")
+        btn_UserShow.pack()
+        self.notebook.add(userFrame, text="User")
+
+###########################################################################
 
 
         """SEARCH"""
@@ -337,8 +505,8 @@ class SecondWindow:
 
         # self.notebook.add(frameBilling, text = "Billing" )
         # self.notebook.add(frameItem, text = "Items")
-        self.notebook.add(frameSupplier, text = "Supplier")
-        self.notebook.add(frameClient, text = "Client")
+        # self.notebook.add(frameSupplier, text = "Supplier")
+        # self.notebook.add(frameClient, text = "Client")
         # self.notebook.add(frameUser, text = "User" )
         self.notebook.add(frameSearch, text = "Search", state="disabled")# $Note: $to improuve that depending and the user
         # notebook widget can be 'disabled', 'normal' 'hidden' $ maybe  with boolean in _user TABLE can be add it and
