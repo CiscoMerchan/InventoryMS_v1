@@ -108,14 +108,16 @@ class SecondWindow:
         lis = []
         for i in range(1, 50):
             itemlist = (
-            f'{i}', "object", "Object to create objects", "supplier", 100 + (i * 4), f"${2 + i}", 5 * i, "level 1")
+            f'{i}', "object", "17/02/2023", "supplier", 100 + (i * 4), f"${2 + i}", 5 * i, "level 1",
+            f'{i*2}%', 'trhsfghsfgbhsfgbafcvarvfvafvafva afvgasfavbsf asfdvasfv ', f'ID{i}')
             lis.append(itemlist)
         print(lis)
         # item_tree.insert('','end', text=itemlist[0], values=itemlist[0:])
         ######################## ITEM TREEVIEW
 
         Billing_tree = ttk.Treeview(BillingTreeview, height=18, columns=(
-        "Item Code", "Name", "Description", "Supplier", "Quantity", "Price", "Min. Stock", "Location"), show="headings")
+            "Reference ID", "Type of Transaction", "Date", "Company ID", "Item ID", "Item Name", "Quantity", "Price",
+            "Discount", "Description", "UserID"), show="headings")
         Billing_tree.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
         # item_tree.insert('', 'end', text=itemlist[0], values=lis[0:])   # Insert data into the treeview
         for row in lis:
@@ -125,23 +127,29 @@ class SecondWindow:
         Billing_tree_scroll.pack(side=tkinter.LEFT, fill=tkinter.Y)
         Billing_tree.configure(yscrollcommand=Billing_tree_scroll.set)
         ##### Heading of the treeview
-        Billing_tree.heading(0, text="Item Code", anchor='center')
-        Billing_tree.heading(1, text="Name", anchor='center')
-        Billing_tree.heading(2, text="Description", anchor='center')
-        Billing_tree.heading(3, text="Supplier ID", anchor='center')
-        Billing_tree.heading(4, text="Quantity", anchor='center')
-        Billing_tree.heading(5, text="Price", anchor='center')
-        Billing_tree.heading(6, text="Min. Stock", anchor='center')
-        Billing_tree.heading(7, text="Location", anchor='center')
+        Billing_tree.heading(0, text="Reference ID", anchor='center')
+        Billing_tree.heading(1, text="Type of Transacation", anchor='center')
+        Billing_tree.heading(2, text="Date", anchor='center')
+        Billing_tree.heading(3, text="Company ID", anchor='center')
+        Billing_tree.heading(4, text="Item ID", anchor='center')
+        Billing_tree.heading(5, text="Item Name", anchor='center')
+        Billing_tree.heading(6, text="Quantity", anchor='center')
+        Billing_tree.heading(7, text="Price", anchor='center')
+        Billing_tree.heading(8, text="Discount", anchor='center')
+        Billing_tree.heading(9, text="Description", anchor='center')
+        Billing_tree.heading(10, text="User ID", anchor='center')
         ##### Columns of the treeview
-        Billing_tree.column(0, width=150, anchor='center')
-        Billing_tree.column(1, width=150, anchor='center')
-        Billing_tree.column(2, width=300, anchor='center')
-        Billing_tree.column(3, width=150, anchor='center')
-        Billing_tree.column(4, width=100, anchor='center')
+        Billing_tree.column(0, width=80, anchor='center')
+        Billing_tree.column(1, width=80, anchor='center')
+        Billing_tree.column(2, width=80, anchor='center')
+        Billing_tree.column(3, width=80, anchor='center')
+        Billing_tree.column(4, width=70, anchor='center')
         Billing_tree.column(5, width=100, anchor='center')
-        Billing_tree.column(6, width=100, anchor='center')
-        Billing_tree.column(2, width=150, anchor='center')
+        Billing_tree.column(6, width=60, anchor='center')
+        Billing_tree.column(7, width=50, anchor='center')
+        Billing_tree.column(8, width=60, anchor='center')
+        Billing_tree.column(9, width=300, anchor='center')
+        Billing_tree.column(10, width=50, anchor='center')
 
         ################################# ITEMS TAB, LABELS AND ENTRIES
         inStock = tkinter.IntVar() #If this radiobutton check = 1. else = 0 RADIOBUTTON
@@ -230,7 +238,8 @@ class SecondWindow:
         # item_tree.insert('','end', text=itemlist[0], values=itemlist[0:])
         ######################## ITEM TREEVIEW
 
-        item_tree = ttk.Treeview(itemTreeview, height=18, columns=("Item Code", "Name", "Description","Supplier", "Quantity","Price","Min. Stock", "Location"), show="headings")
+        item_tree = ttk.Treeview(itemTreeview, height=18, columns=("Item Code","Name", "Description","Supplier",
+                                                                   "Quantity","Price","Min. Stock", "Location"), show="headings")
         item_tree.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
         # item_tree.insert('', 'end', text=itemlist[0], values=lis[0:])   # Insert data into the treeview
         for row in lis:
