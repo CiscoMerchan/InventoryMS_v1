@@ -45,8 +45,12 @@ Challange:
  and Frame widget.
     *No real challenge today. Today it was more about rendering each tab using a a blueprint the ItemFrame
 
+17/02/2023
+* Add Billing tab
+
 TODO
-    # Add download button and column for image in item tab.
+    # Check billing tab radiobutton ()
+    # Add download button and column for image in item tab. MAY BE
     #Finish Item tabs and used as a blueprint for the other tabs that I just need to refactor varaibles,values,etc. Code
     is the same. DONE for: items, supplier, clients and users.
     # Document and clean code in logingGUI_1.py

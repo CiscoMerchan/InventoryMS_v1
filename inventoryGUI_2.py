@@ -1,7 +1,9 @@
 # Here will be the frame to operate the inventory
 import tkinter
 from sys import path
-from tkinter import ttk, messagebox, END
+from tkinter import ttk, messagebox, END, Text, Radiobutton
+
+import tkcalendar as tkcalendar
 from accesory import CreateToolTip
 from usersBD import UserDb
 collection = UserDb()
@@ -80,45 +82,122 @@ class SecondWindow:
         #Frames by Categories
         """BILLING"""
        
-        ##################
-        # itemFrame = ttk.Frame(self.notebook)
-        # itemTab = ttk.Frame(itemFrame)
-        # itemTab.pack(side=tkinter.LEFT)
-        # itemTreeview = ttk.Frame(itemFrame)
-        # itemTreeview.pack(side=tkinter.LEFT)
-        #
-        # ######################## BILLING TREEVIEW
-        # item_tree = ttk.Treeview(itemTreeview, height = 20 ,columns=(1, 2, 3, 4), show="headings")
-        # item_tree.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
-        # ### SCROLLBAR
-        # item_tree_scroll = ttk.Scrollbar(itemTreeview, orient="vertical", command=item_tree.yview)
-        # item_tree_scroll.pack(side=tkinter.LEFT, fill=tkinter.Y)
-        # item_tree.configure(yscrollcommand=item_tree_scroll.set)
-        # item_tree.heading(1, text="Column 1")
-        # item_tree.heading(2, text="Column 2")
-        # item_tree.heading(3, text="Column 3")
-        # item_tree.heading(4, text="Column 4")
-        # ################################# BILLING TAB ENTRIES
-        # lb_ItemCode = ttk.Label(itemTab, text="Label 1")
-        # lb_ItemCode.pack()
-        # self.itemCodeEntry = ttk.Entry(itemTab)
-        # self.itemCodeEntry.pack()
-        # lb_ItemName = ttk.Label(itemTab, text="Label 2")
-        # lb_ItemName.pack()
-        # billing_left_frame_entry2 = ttk.Entry(itemTab)
-        # billing_left_frame_entry2.pack()
-        # lb_ItemDescription = ttk.Label(itemTab, text="Label 3")
-        # lb_ItemDescription.pack()
-        # itemDescriptionEntry = ttk.Entry(itemTab)
-        # itemDescriptionEntry.pack()
-        # billing_left_frame_button1 = ttk.Button(itemTab, text="Button 1")
-        # billing_left_frame_button1.pack()
-        # btn_UpdateItem = ttk.Button(itemTab, text="Button 2")
-        # btn_UpdateItem.pack()
-        # btn_ItemShow = ttk.Button(itemTab, text="Button 3")
-        # btn_ItemShow.pack()
-        # self.notebook.add(itemFrame, text="Billing")
+        #################
+        #### MAIN FRAME ######################################################################
+        BillingFrame = ttk.Frame(self.notebook)
+        ##### TOP FRAME FOR LABELS (RENDER INFORMATION  #######################################
+        BillingTopTab = ttk.Frame(BillingFrame)
+        BillingTopTab.pack(side=tkinter.TOP)
+        #### LEFT FRAME FOR THE ENTRIES, LABELS AND BUTTONS ###############################
+        BillingTab = ttk.Frame(BillingFrame)
+        BillingTab.pack(side=tkinter.LEFT)
+        #### RIGHT FRAME FOR TREEVIEW AND SCROLLBAR ############################################
+        BillingTreeview = ttk.Frame(BillingFrame)
+        BillingTreeview.pack(side=tkinter.RIGHT)
+        ###### TEST For Labels at the top of the treevieww to render information#########
+        lb_title = ttk.Label(BillingTopTab, text='Itemfgsf Name')
+        lb_title.pack()
+        lb_title = ttk.Label(BillingTopTab, text='Itemfgsf ')
+        lb_title.pack(side=tkinter.RIGHT, padx=10)
+        lb_title = ttk.Label(BillingTopTab, text=' Name')
+        lb_title.pack(side=tkinter.LEFT, padx=10)
+        lb_title = ttk.Label(BillingTopTab, text='Item Name')
+        lb_title.pack(padx=10)
+        #####################################################
+        ###############test insert in treeview
+        lis = []
+        for i in range(1, 50):
+            itemlist = (
+            f'{i}', "object", "Object to create objects", "supplier", 100 + (i * 4), f"${2 + i}", 5 * i, "level 1")
+            lis.append(itemlist)
+        print(lis)
+        # item_tree.insert('','end', text=itemlist[0], values=itemlist[0:])
+        ######################## ITEM TREEVIEW
 
+        Billing_tree = ttk.Treeview(BillingTreeview, height=18, columns=(
+        "Item Code", "Name", "Description", "Supplier", "Quantity", "Price", "Min. Stock", "Location"), show="headings")
+        Billing_tree.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
+        # item_tree.insert('', 'end', text=itemlist[0], values=lis[0:])   # Insert data into the treeview
+        for row in lis:
+            Billing_tree.insert('', 'end', values=row)  # test Insert data into the treeview
+        # Scrollbar for the treeview
+        Billing_tree_scroll = ttk.Scrollbar(BillingTreeview, orient="vertical", command=Billing_tree.yview)
+        Billing_tree_scroll.pack(side=tkinter.LEFT, fill=tkinter.Y)
+        Billing_tree.configure(yscrollcommand=Billing_tree_scroll.set)
+        ##### Heading of the treeview
+        Billing_tree.heading(0, text="Item Code", anchor='center')
+        Billing_tree.heading(1, text="Name", anchor='center')
+        Billing_tree.heading(2, text="Description", anchor='center')
+        Billing_tree.heading(3, text="Supplier ID", anchor='center')
+        Billing_tree.heading(4, text="Quantity", anchor='center')
+        Billing_tree.heading(5, text="Price", anchor='center')
+        Billing_tree.heading(6, text="Min. Stock", anchor='center')
+        Billing_tree.heading(7, text="Location", anchor='center')
+        ##### Columns of the treeview
+        Billing_tree.column(0, width=150, anchor='center')
+        Billing_tree.column(1, width=150, anchor='center')
+        Billing_tree.column(2, width=300, anchor='center')
+        Billing_tree.column(3, width=150, anchor='center')
+        Billing_tree.column(4, width=100, anchor='center')
+        Billing_tree.column(5, width=100, anchor='center')
+        Billing_tree.column(6, width=100, anchor='center')
+        Billing_tree.column(2, width=150, anchor='center')
+
+        ################################# ITEMS TAB, LABELS AND ENTRIES
+        inStock = tkinter.IntVar() #If this radiobutton check = 1. else = 0 RADIOBUTTON
+        outStock = tkinter.IntVar() #If this radiobutton check = 1 else = 0 RADIOBUTTON
+        inStock = tkinter.Radiobutton(BillingTab, text="In", variable=inStock, command="")
+        inStock.pack(side=tkinter.TOP)
+        outStock = tkinter.Radiobutton(BillingTab, text="Out", variable=outStock, command="")
+        outStock.pack()
+
+        date = tkcalendar.DateEntry(BillingTab, width=10)
+        date.pack()
+        lb_ItemCode = ttk.Label(BillingTab, text="Reference Number:")
+        lb_ItemCode.pack()
+        self.BillingCodeEntry = ttk.Entry(BillingTab)
+        self.BillingCodeEntry.pack()
+        lb_ItemName = ttk.Label(BillingTab, text="Company ID:")
+        lb_ItemName.pack()
+        self.BillingNameEntry = ttk.Entry(BillingTab)
+        self.BillingNameEntry.pack()
+        lb_ItemDescription = ttk.Label(BillingTab, text="Item ID:")
+        lb_ItemDescription.pack()
+        self.BillingDescriptionEntry = ttk.Entry(BillingTab)
+        self.BillingDescriptionEntry.pack()
+        lb_ItemDescription = ttk.Label(BillingTab, text="Item Name:")
+        lb_ItemDescription.pack()
+        self.BillingDescriptionEntry = ttk.Entry(BillingTab)
+        self.BillingDescriptionEntry.pack()
+        lb_ItemSupplierId = ttk.Label(BillingTab, text="Quantity:")
+        lb_ItemSupplierId.pack()
+        self.BillingSupplierIdEntry = ttk.Entry(BillingTab)
+        self.BillingSupplierIdEntry.pack()
+        lb_ItemQuantity = ttk.Label(BillingTab, text="Price:")
+        lb_ItemQuantity.pack()
+        self.BillingQuantityEntry = ttk.Entry(BillingTab)
+        self.BillingQuantityEntry.pack()
+        lb_ItemPrice = ttk.Label(BillingTab, text="Discount:")
+        lb_ItemPrice.pack()
+        self.BillingPriceEntry = ttk.Entry(BillingTab)
+        self.BillingPriceEntry.pack()
+        lb_ItemMinStock = ttk.Label(BillingTab, text="Description:")
+        lb_ItemMinStock.pack()
+        self.BillingMinStockEntry = tkinter.Text(BillingTab, width = 20, height = 3)
+        self.BillingMinStockEntry.pack()
+
+
+
+        ###BUTTONS
+        btn_InsertItem = ttk.Button(BillingTab, text="Insert")
+        btn_InsertItem.pack()
+        btn_UpdateItem = ttk.Button(BillingTab, text="Update")
+        btn_UpdateItem.pack(side=tkinter.RIGHT)
+        btn_ItemShow = ttk.Button(BillingTab, text="Show")
+        btn_ItemShow.pack()
+        ####
+        self.notebook.add(BillingFrame, text="Billing")
+                  ## END BILLING ###
 ###################################################################
         """ITEMS"""
         #### MAIN FRAME ######################################################################
@@ -224,6 +303,7 @@ class SecondWindow:
         btn_UpdateItem.pack(side=tkinter.RIGHT)
         btn_ItemShow = ttk.Button(itemTab, text="Show")
         btn_ItemShow.pack()
+
         self.notebook.add(itemFrame, text="Items")
 
 
@@ -528,9 +608,7 @@ class SecondWindow:
 
 
 def app():
-    # user_id= UserDb.user_check()[0]
-    # user_name = UserDb.user_check()[1]
-    # print(user_id, user_name)
+
     root = tkinter.Tk()
     window = SecondWindow(root,6,"Alba") #6,"Alba" is to activate the page, when finished delete only root left
 
@@ -539,63 +617,3 @@ def app():
 if __name__ == '__main__':
     app()
 
-"""# Create the user frame with grid geometry manager
-frameUser = ttk.Frame(self.notebook)
-frameUser.grid(row=0, column=0, sticky="nsew")
-
-# Place the user input widgets in the left side of the frame using grid geometry manager
-lb_Title = ttk.Labelframe(frameUser, text="User")
-lb_Title.grid(row=0, column=0, padx=8, pady=4, sticky="nsew")
-
-lb_UserName = ttk.Label(lb_Title, text="* Name:", font=LABELS)
-lb_UserName.grid(row=0, column=0, padx=8, pady=4, sticky="w")
-self.userNameEntry = ttk.Entry(lb_Title, textvariable="Name")
-self.userNameEntry.grid(row=0, column=1, padx=8, pady=4, sticky="w")
-
-lb_UserLastName = ttk.Label(lb_Title, text="* Lastname:", font=LABELS)
-lb_UserLastName.grid(row=1, column=0, padx=8, pady=4, sticky="w")
-self.userLastNameEntry = ttk.Entry(lb_Title, textvariable="LastName")
-self.userLastNameEntry.grid(row=1, column=1, padx=8, pady=4, sticky="w")
-
-lb_UserEmail = ttk.Label(lb_Title, text="Email:", font=LABELS)
-lb_UserEmail.grid(row=2, column=0, padx=8, pady=4, sticky="w")
-self.userEmailEntry = ttk.Entry(lb_Title, textvariable="Email")
-self.userEmailEntry.grid(row=2, column=1, padx=8, pady=4, sticky="w")
-
-lb_Mandatory = ttk.Label(lb_Title, text="* case mandatory", font=('', 8, 'bold'))
-lb_Mandatory.grid(row=3, column=0, padx=8, pady=4, sticky="w")
-self.cb_Admin = ttk.Checkbutton(lb_Title, text='Admin', variable="Admin", onvalue=1, offvalue=0)
-self.cb_Admin.grid(row=3, column=1, padx=8, pady=4, sticky="w")
-CreateToolTip(self.cb_Admin, text=' \n If new user will be part of Admin check the box \n')
-
-btn_Insert = ttk.Button(lb_Title, text='Insert', command=lambda: self.insert_user_data())
-btn_Insert.grid(row=4, column=0, padx=8, pady=4, sticky="w")
-
-btn_Show = ttk.Button(lb_Title, text='Show')
-btn_Show.grid(row=4, column=1, padx=8, pady=4, sticky="w")
-
-btn_Update = ttk.Button(lb_Title, text='Update')
-btn_Update.grid(row=5, column=0, columnspan=2, padx=8, pady=4, sticky="w")
-
-# Create treeview
-
-tree = ttk.Treeview(frameTreeView, columns=('Item', 'ID', 'Name', 'Last Name', 'Email', 'Level'))
-tree.heading('#0', text='Users')
-tree.heading('#1', text='ID')
-tree.heading('#2', text='Name')
-tree.heading('#3', text='Last Name')
-tree.heading('#4', text='Email')
-tree.heading('#5', text='Level')
-tree.column('#1', stretch=tkinter.YES)
-tree.column('#2', stretch=tkinter.YES)
-tree.column('#0', stretch=tkinter.YES)
-tree.column('#3', stretch=tkinter.YES)
-tree.column('#4', stretch=tkinter.YES)
-tree.column('#5', stretch=tkinter.YES)
-
-# Add vertical scrollbar
-vsb = ttk.Scrollbar(frameTreeView, orient="vertical", command=tree.yview)
-tree.configure(yscrollcommand=vsb.set)
-vsb.pack(side='right', fill='y')
-
-"""
