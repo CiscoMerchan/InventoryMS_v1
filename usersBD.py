@@ -13,8 +13,8 @@ class UserDb:
     conn.autocommit = True
     # Creating a cursor object
     cursor = conn.cursor()
-    """User Data collection from user_window.py INTO _users TABLES   """
-
+    ########################################## INSERT AND VERIFICATION #####################################
+    " This function is to INSERT Users values INTO _users TABLES   "
     def user_data_collection(self, firstname, lastname, email):
         conn.autocommit = True
         # Creating a cursor object
@@ -36,6 +36,8 @@ class UserDb:
 
 
     """RETURN OF THE USER ID FROM THE NAME AND LASTNAME ENTERED _users TABLES   """
+    # The porpuse of this funtion is that after the data is Inserted back to fetch the entered data and returned
+    # to the GUI but this time from the DB and not from the entered data directly entered ba the User
     def users_return(self):
             conn.autocommit = True
             # Creating a cursor object
@@ -56,7 +58,8 @@ class UserDb:
             # Close the cursor and connection
             cursor.close()
             # conn.close()
-
+    """Callback function that take User ID and Name, verify is the data is in the DB and will return as callback
+    True or False"""
     def user_check(self,_user_name, _user_id, callback):
         # try:
             conn.autocommit = True
@@ -66,19 +69,20 @@ class UserDb:
             sql = (f"SELECT * FROM _users WHERE user_id = '{_user_id}' AND user_first_name ='{_user_name}' ")
             # executing above query
             cursor.execute(sql)
-            result = cursor.fetchone()
+            self.result = cursor.fetchone()
             # If a result is returned, return True
             # if result[0] == int(_user_id) and result[1] == _user_name:
             print("BD.OK")
-            if result:
+            if self.result:
              callback(True)
+             return self.result
              print(str(result)+'dbOK')
             # If no result is returned, return False
             # else:
             #     callback(False)
                 # print(str(result) + 'dbNO')
             # Catch and print any errors that occur while connecting to the database
-
+            """$$ Once the except is active it take over the TRY: *** To check """
         # except (Exception, psycopg2.Error) as error:
         #     # callback(False)
         #     print("Error while connecting to PostgreSQL", error)
@@ -88,5 +92,10 @@ class UserDb:
     #     cursor.close()
     #     conn.close()
 #         print("db close")
+#############################################$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$###############################
 
+###########################################  UPDATE ###################################################
+
+    def update(self):
+        pass
 

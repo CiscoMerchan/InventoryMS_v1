@@ -4,22 +4,27 @@ import time
 import tkinter
 from tkinter import Label, Entry, Button, Frame, Toplevel, messagebox
 from tkinter import ttk
-from _userDB import UserDb
-
+from usersBD import UserDb
+from inventoryGUI_2 import SecondWindow
 userdb = UserDb()
 
 
 class FirstWindow:
-
+    print("__int__")
     def __init__(self, root):
+        print("after _inti_")
         self.root = root
+        # self.user_name = self.username.get()
+        # self.user_id = self.password.get()
+        print('before Top')
         self.root = Toplevel()
+        print('after Top')
         self.root.title('"Inventory System/Account Login"(Welcome to v.2)')
         self.root.destroy()
         # screen_width = root.winfo_screenwidth()
         # screen_height = root.winfo_screenheight()
         ################
-
+        print('before Toplogin')
         TopLoginForm = Frame(root, bd=1, width=300, height=30, )  # width=300, height=30,
         TopLoginForm.pack()  # side='top'
         lbl_text = Label(TopLoginForm, text="Administrator Login", font=('arial', 12))  #
@@ -49,16 +54,20 @@ class FirstWindow:
     #############
 
     # Check if user is in the DB
+    print('before checkuser')
     def check_user(self):
         # Checking name and id from user with a callback function
-        result = userdb.user_check(self.username.get(), self.password.get(), self.openWin)
-        return result
+        self.result = userdb.user_check(self.username.get(),self.password.get(), self.openWin)
+        print(self.result)
+
+        return self.result
 
     # Callback function
+    print('before openwin')
     def openWin(self, check_user):
         user_id = self.password.get()
         user_name = self.username.get()
-
+        print('in open win')
         if check_user == False:
             print('false')
             # message no working may self.result from db ( to try)
@@ -66,14 +75,17 @@ class FirstWindow:
 
 
         else:
-            print('seconwin')
-            from v2_page2 import SecondWindow
+            print('else open win')
+
             # No Working FirstWindow not destroy
             self.root.destroy()
             # SecondWindow take has argument user log id ( I can used to take data from the database and aswell to registre
             # in every oparation the user id
-            SecondWindow(self.root, user_id, user_name)
-
+            print('before secondwin')
+            SecondWindow(tkinter.Tk(), user_id,user_name)
+            print('after secondwin')
+            print(user_id)
+            print(user_name)
 
 def app():
     root = tkinter.Tk()
