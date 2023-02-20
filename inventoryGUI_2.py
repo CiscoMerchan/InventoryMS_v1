@@ -5,51 +5,89 @@ from tkinter import ttk, messagebox, END, Text, Radiobutton
 
 import tkcalendar as tkcalendar
 from accesory import CreateToolTip
+# Import DATABASE
 from usersBD import UserDb
+#Acces to _users TABLE
 collection = UserDb()
 from backend_user import User
 
-
+ID = ""
 LABELS = ("",12, '')
 class SecondWindow:
-#######################################$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$########################################
+#######################################$$$$$$$$$$$$$  USER   $$$$$$$$$$$$$$$$$########################################
     """User data operation"""
     #User INSERT data
     def insert_user_data(self):
         Name = self.userNameEntry.get()
         LastName = self.userLastNameEntry.get()
         Email = self.userEmailEntry.get()
-        Admin = self.cb_Admin.get() ###To change
-        print(Admin)
-        print('en incert data')
-        """Before INSERT data into the database this is a message to confirme the entered data"""
-        confirmation = messagebox.askyesno("Confirmation", f"the new User is : {Name} {LastName}\n {Email}?")
-        """If the data is correct the data will be insert into _users table and will return the id number of the user """
-        """if the user click 'NO' the data in the entries case will be deleted and the user will rewrite thier data"""
-        if confirmation == False:
-            print('cofirmacion falsa')
-            Name.delete(0, END) #self.userNameEntry.delete(0, END)
-            LastName.delete(0, END)#self.userLastNameEntry.delete(0, END)
-            Email.delete(0, END) # self.userEmailEntry.delete(0, END)
+        # Admin = self.cb_Admin.get() ###To change
+        # print(Admin)
+        '''Check that all the necessary cases contains data'''
+        if Name=='' or LastName =='' or Email=='' :
+            messagebox.showerror('Error!', "Name, Lastname and Email must be entered")
         else:
-            # Data colleted and insert
-            print('else')
-            collection.user_data_collection(
-                Name.lower(), LastName.lower(),Email
-            )
-            # return of the user id number
-            messagebox.showinfo(f"Your user ID: {str(collection.last_insert_id)}",
-                                f"Welcome to Inventory {Name} {LastName} this is your User ID: {str(collection.last_insert_id)}. \n This number is your ID and is necessary to use")
-            print('ultimo mensaje')
-            if True:
-                print('now deleted data')
-                self.userNameEntry.delete(0, END)
-                self.userLastNameEntry.delete(0, END)
-                self.userEmailEntry.delete(0, END)
+            print('en incert data')
+            """Before INSERT data into the database this is a message to confirme the entered data"""
+            confirmation = messagebox.askyesno("Confirmation", f"the new User is : {Name} {LastName}\n {Email}?")
+            """If the data is correct the data will be insert into _users table and will return the id number of the user """
+            """if the user click 'NO' the data in the entries case will be deleted and the user will rewrite thier data"""
+            if confirmation == False:
+                print('cofirmacion falsa')
+                Name.delete(0, END) #self.userNameEntry.delete(0, END)
+                LastName.delete(0, END)#self.userLastNameEntry.delete(0, END)
+                Email.delete(0, END) # self.userEmailEntry.delete(0, END)
+            else:
+                # Data colleted and insert
+                print('else')
+                collection.user_data_collection(
+                    Name.lower(), LastName.lower(),Email
+                )
+                # return of the user id number
+                messagebox.showinfo(f"Your user ID: {str(collection.last_insert_id)}",
+                                    f"Welcome to Inventory {Name} {LastName} this is your User ID: {str(collection.last_insert_id)}. \n This number is your ID and is necessary to use")
+                print('ultimo mensaje')
+                if True:
+                    print('now deleted data')
+                    self.userNameEntry.delete(0, END)
+                    self.userLastNameEntry.delete(0, END)
+                    self.userEmailEntry.delete(0, END)
 
-            # User UPDATE data
+            # User UPDATE data   THIS CODE  IS NOT WORKING
     def userUpdate(self):
-      pass
+        idUser = self.userIdEntry.get()
+        Email = self.userEmailEntry.get()
+        print(idUser)
+        print(Email)
+        # check is the case id and email are fill. Only email can be updated in user DB
+        if idUser == ''  or Email == '':
+            messagebox.showerror('Opp! Error Update', 'For Update User "email", ID and email case must be filled! ')
+        else:
+            print("A confirmar")
+            # messsage to confirme with the user if the data to Update is correct
+            confirmation = messagebox.askyesno(
+                "User Update", f"For User ID: {idUser} Do you wan to update the email to: {Email}   ")
+            if confirmation :
+
+                collection.updateUser(id=idUser,email=Email)
+                if True:
+                    messagebox.showinfo('Message', f'User email is Updated')
+                    self.userNameEntry.delete(0,END)
+                    self.userEmailEntry.delete(0, END)
+                else:
+                    messagebox.showerror('Ops!', "Error, the User email hasn't been updated")
+    # User Tab, Show button - update Treeview
+    def show(self):
+        #1- first clear the data in treeview (otherwise the data in treeview will be repeated)
+        for item in self.user_tree.get_children():
+            self.user_tree.delete(item)
+        #2- fetch data from DB
+        allusers = collection.userAll()
+
+        for row in allusers:
+            #3- INSERTION OF VALUES FROM DB TO TREEVIEEW
+            self.user_tree.insert('', 'end', text=row[0], values=row[0:])
+#######################################################################################################
 #######################################$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$########################################
     def __init__(self,root,*args):
         print('__init__')
@@ -95,7 +133,7 @@ class SecondWindow:
         BillingTreeview = ttk.Frame(BillingFrame)
         BillingTreeview.pack(side=tkinter.RIGHT)
         ###### TEST For Labels at the top of the treevieww to render information#########
-        lb_title = ttk.Label(BillingTopTab, text='Itemfgsf Name')
+        lb_title = ttk.Label(BillingTopTab, text='User ID selected : ')
         lb_title.pack()
         lb_title = ttk.Label(BillingTopTab, text='Itemfgsf ')
         lb_title.pack(side=tkinter.RIGHT, padx=10)
@@ -514,50 +552,79 @@ class SecondWindow:
         userTreeview = ttk.Frame(userFrame)
         userTreeview.pack(side=tkinter.RIGHT)
         ###### TEST For Labels at the top of the treevieww to render information#########
-        lb_title = ttk.Label(userTopTab, text='Itemfgsf Name')
+
+        lb_title = ttk.Label(userTopTab, text='Selection:', font=('',16,'bold'))
         lb_title.pack()
-        lb_title = ttk.Label(userTopTab, text='Itemfgsf ')
-        lb_title.pack(side=tkinter.RIGHT, padx=10)
-        lb_title = ttk.Label(userTopTab, text=' Name')
-        lb_title.pack(side=tkinter.LEFT, padx=10)
-        lb_title = ttk.Label(userTopTab, text='Item Name')
-        lb_title.pack(padx=10)
+        lb_1Title = ttk.Label(userTopTab, text='User Id: ', font=('',12,'bold'))
+        lb_1Title.pack(side=tkinter.LEFT )
+        lb_titleUser = ttk.Label(userTopTab, text='', background='white', font=('',14,'bold'))
+        lb_titleUser.pack(side=tkinter.LEFT )
+        lb_2Title = ttk.Label(userTopTab, text='     Name:', font=('',12,'bold'))
+        lb_2Title.pack(side=tkinter.LEFT)
+        lb_titleName = ttk.Label(userTopTab, text='',background='white')
+        lb_titleName.pack(side=tkinter.LEFT)
+        lb_3Title = ttk.Label(userTopTab, text='     Lastname:', font=('',12,'bold'))
+        lb_3Title.pack(side=tkinter.LEFT)
+        lb_titleLastName = ttk.Label(userTopTab, text='',background='white')
+        lb_titleLastName.pack(side=tkinter.LEFT)
+        lb_4Title = ttk.Label(userTopTab, text='     Email:', font=('',12,'bold'))
+        lb_4Title.pack(side=tkinter.LEFT)
+        lb_titleEmail = ttk.Label(userTopTab, text='',background='white')
+        lb_titleEmail.pack(side=tkinter.LEFT)
+
+
         #####################################################
-        ###############test insert in treeview
-        lis = []
-        for i in range(1, 50):
-            suplist = (
-                 i, f"Name {i}", f"Last Name {i}",f"email{i}")
-            lis.append(suplist)
-        print(lis)
-        # user_tree.insert('','end', text=itemlist[0], values=itemlist[0:])
+
+
+
         ######################## ITEM TREEVIEW
 
-        user_tree = ttk.Treeview(userTreeview, height=18, columns=(
+        self.user_tree = ttk.Treeview(userTreeview, height=18, columns=(
             "User ID", "Name", "Last Name", "Email"), show="headings")
-        user_tree.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
-        # user_tree.insert('', 'end', text=itemlist[0], values=lis[0:])   # Insert data into the treeview
-        for row in lis:
-            user_tree.insert('', 'end', values=row)  # test Insert data into the treeview
-        # Scrollbar for the treeview
-        user_tree_scroll = ttk.Scrollbar(userTreeview, orient="vertical", command=user_tree.yview)
+        self.user_tree.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
+        # ALL USER FROM THE DB
+
+        # allusers = collection.userAll()
+        # for row in allusers:
+        #
+        #     # INSERTION OF VALUES FROM DB TO TREEVIEEW
+        #     self.user_tree.insert('', 'end', text=row[0], values=row[0:])   # Insert data into the treeview
+       #
+        user_tree_scroll = ttk.Scrollbar(userTreeview, orient="vertical", command=self.user_tree.yview)
         user_tree_scroll.pack(side=tkinter.LEFT, fill=tkinter.Y)
-        user_tree.configure(yscrollcommand=user_tree_scroll.set)
+        self.user_tree.configure(yscrollcommand=user_tree_scroll.set)
         ##### Heading of the treeview
-        user_tree.heading(0, text="User ID", anchor='center')
-        user_tree.heading(1, text="Name", anchor='center')
-        user_tree.heading(2, text="Last Name", anchor='center')
-        user_tree.heading(3, text="Email", anchor='center')
+        self.user_tree.heading(0, text="User ID", anchor='center')
+        self.user_tree.heading(1, text="Name", anchor='center')
+        self.user_tree.heading(2, text="Last Name", anchor='center')
+        self.user_tree.heading(3, text="Email", anchor='center')
 
         ##### Columns of the treeview
-        user_tree.column(0, width=150, anchor='center')
-        user_tree.column(1, width=300, anchor='center')
-        user_tree.column(2, width=300, anchor='center')
-        user_tree.column(3, width=350, anchor='center')
+        self.user_tree.column(0, width=150, anchor='center')
+        self.user_tree.column(1, width=300, anchor='center')
+        self.user_tree.column(2, width=300, anchor='center')
+        self.user_tree.column(3, width=350, anchor='center')
+        ####################################
+        ####Select items from the treeview###
+        ######################################
+        def treeview_select(event):
+            select_userId = event.widget.selection()[0]
 
+            select_userIdValue = event.widget.item(select_userId)['values']
+            #       Configrtion of the labes at the topframe
+            lb_titleUser.config(text= select_userIdValue[0] )
+            lb_titleName.config(text= select_userIdValue[1] )
+            lb_titleLastName.config(text= select_userIdValue[2] )
+            lb_titleEmail.config(text=select_userIdValue[3])
 
+            return select_userIdValue#, select_userNameValue
+        self.user_tree.bind('<<TreeviewSelect>>', treeview_select)
+        #######################################################
         ################################# CLIENTS TAB, LABELS AND ENTRIES
-
+        lb_UserId = ttk.Label(userTab, text="ID:")
+        lb_UserId.pack()
+        self.userIdEntry = ttk.Entry(userTab)
+        self.userIdEntry.pack()
         lb_UserName = ttk.Label(userTab, text="Name:")
         lb_UserName.pack()
         self.userNameEntry = ttk.Entry(userTab)
@@ -573,11 +640,14 @@ class SecondWindow:
 
 
         ###BUTTONS
-        btn_InsertUser = ttk.Button(userTab, text="Insert", command="")
+        # Insert data into the DB
+        btn_InsertUser = ttk.Button(userTab, text="Insert", command=lambda : self.insert_user_data())
         btn_InsertUser.pack()
-        btn_UpdateUser = ttk.Button(userTab, text="Update", command="")
+        # Update a particular row
+        btn_UpdateUser = ttk.Button(userTab, text="Update", command=lambda : self.userUpdate())
         btn_UpdateUser.pack(side=tkinter.RIGHT)
-        btn_UserShow = ttk.Button(userTab, text="Show", command="")
+        # Refresh data display in treeview
+        btn_UserShow = ttk.Button(userTab, text="Show", command=lambda : self.show())
         btn_UserShow.pack()
         self.notebook.add(userFrame, text="User")
 
@@ -592,11 +662,7 @@ class SecondWindow:
 
         # Notebook Widget
 
-        # self.notebook.add(frameBilling, text = "Billing" )
-        # self.notebook.add(frameItem, text = "Items")
-        # self.notebook.add(frameSupplier, text = "Supplier")
-        # self.notebook.add(frameClient, text = "Client")
-        # self.notebook.add(frameUser, text = "User" )
+
         self.notebook.add(frameSearch, text = "Search", state="disabled")# $Note: $to improuve that depending and the user
         # notebook widget can be 'disabled', 'normal' 'hidden' $ maybe  with boolean in _user TABLE can be add it and
         # depending on True  or False some widget can be used by the user.
