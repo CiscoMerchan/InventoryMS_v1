@@ -572,24 +572,21 @@ class SecondWindow:
         lb_titleEmail = ttk.Label(userTopTab, text='',background='white')
         lb_titleEmail.pack(side=tkinter.LEFT)
 
-
         #####################################################
 
-
-
-        ######################## ITEM TREEVIEW
+        ######################## USER TREEVIEW
 
         self.user_tree = ttk.Treeview(userTreeview, height=18, columns=(
             "User ID", "Name", "Last Name", "Email"), show="headings")
         self.user_tree.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
-        # ALL USER FROM THE DB
 
-        # allusers = collection.userAll()
-        # for row in allusers:
-        #
-        #     # INSERTION OF VALUES FROM DB TO TREEVIEEW
-        #     self.user_tree.insert('', 'end', text=row[0], values=row[0:])   # Insert data into the treeview
-       #
+        """Display in the treeview all the data from the _users TABLE """
+        allusers = collection.userAll()
+        for row in allusers:
+
+            # INSERTION OF VALUES FROM DB TO TREEVIEEW
+            self.user_tree.insert('', 'end', text=row[0], values=row[0:])   # Insert data into the treeview
+        ##############################SCROLL BAR ###########################
         user_tree_scroll = ttk.Scrollbar(userTreeview, orient="vertical", command=self.user_tree.yview)
         user_tree_scroll.pack(side=tkinter.LEFT, fill=tkinter.Y)
         self.user_tree.configure(yscrollcommand=user_tree_scroll.set)
@@ -607,20 +604,27 @@ class SecondWindow:
         ####################################
         ####Select items from the treeview###
         ######################################
+        """this methods is to select,fetch and return data from the clicked row in the treeview """
         def treeview_select(event):
+            # FETCH SELECTED ROW
             select_userId = event.widget.selection()[0]
-
+            # FETCH ALL VALUES OF THE ROW
             select_userIdValue = event.widget.item(select_userId)['values']
-            #       Configrtion of the labes at the topframe
+            """Configuration of the labes at the topframe. When the user clicks one of the row in the treeview the data 
+            from the clicked row will be display at the top. thE VALUE ARE INDEXED"""
+            #USER ID
             lb_titleUser.config(text= select_userIdValue[0] )
+            # USER NAME
             lb_titleName.config(text= select_userIdValue[1] )
+            #USER LASTNAME
             lb_titleLastName.config(text= select_userIdValue[2] )
+            #USER EMAIL
             lb_titleEmail.config(text=select_userIdValue[3])
 
-            return select_userIdValue#, select_userNameValue
+            return select_userIdValue
         self.user_tree.bind('<<TreeviewSelect>>', treeview_select)
         #######################################################
-        ################################# CLIENTS TAB, LABELS AND ENTRIES
+        ################################# USER TAB, LABELS AND ENTRIES
         lb_UserId = ttk.Label(userTab, text="ID:")
         lb_UserId.pack()
         self.userIdEntry = ttk.Entry(userTab)
@@ -638,7 +642,6 @@ class SecondWindow:
         self.userEmailEntry = ttk.Entry(userTab)
         self.userEmailEntry.pack()
 
-
         ###BUTTONS
         # Insert data into the DB
         btn_InsertUser = ttk.Button(userTab, text="Insert", command=lambda : self.insert_user_data())
@@ -649,6 +652,7 @@ class SecondWindow:
         # Refresh data display in treeview
         btn_UserShow = ttk.Button(userTab, text="Show", command=lambda : self.show())
         btn_UserShow.pack()
+        ######
         self.notebook.add(userFrame, text="User")
 
 ###########################################################################
