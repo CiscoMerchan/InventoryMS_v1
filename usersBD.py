@@ -13,6 +13,23 @@ class UserDb:
     conn.autocommit = True
     # Creating a cursor object
     cursor = conn.cursor()
+
+    ############All the data from the table to render in the treeviw####
+
+    def userAll(self):
+        conn.autocommit = True
+        # Creating a cursor object
+        cursor = conn.cursor()
+        # INSERT
+        cursor.execute("SELECT * FROM _users ORDER BY user_id ASC; ")
+
+        # Get the last inserted id
+        """This return all the data in _users TABLE """
+        dataUsers = cursor.fetchall()
+
+        # Commit the changes to the database
+        conn.commit()
+        return dataUsers
     ########################################## INSERT AND VERIFICATION #####################################
     " This function is to INSERT Users values INTO _users TABLES   "
     def user_data_collection(self, firstname, lastname, email):
@@ -96,6 +113,117 @@ class UserDb:
 
 ###########################################  UPDATE ###################################################
 
-    def update(self):
+    def updateUser(self, id , email):
+        # try:
+        conn.autocommit = True
+        # Creating a cursor object
+        cursor = conn.cursor()
+        # SELECT QUERY
+        print(f"before sql {id}  {email}")
+        sql = (f"UPDATE _users SET user_email = '{email}' WHERE user_id = {int(id)}")
+        print(f"after sql {id}  {email}")
+        # executing above query
+        cursor.execute(sql)
+        print(f"after execution sql sql {id}  {email}")
+        cursor.fetchone()
+
+        # If a result is returned, return True
+        # if result[0] == int(_user_id) and result[1] == _user_name:
+        print("BD.OK")
+        # if self.result:
+        #     callback(True)
+        #     return self.result
+        #     print(str(result) + 'dbOK')
+        # If no result is returned, return False
+        # else:
+        #     callback(False)
+        # print(str(result) + 'dbNO')
+        # Catch and print any errors that occur while connecting to the database
+        """$$ Once the except is active it take over the TRY: *** To check """
+    # except (Exception, psycopg2.Error) as error:
+    #     # callback(False)
+    #
+
+class SupplierDB:
+    def in_newSupplier(self):
         pass
 
+    def checkSupplier(self):
+        pass
+
+    def allSuppliers(self):
+        pass
+
+    def a_Supplier(self):
+        pass
+
+    def updateSupplier(self):
+        pass
+
+class ClientDB:
+    def in_newClient(self):
+        pass
+
+    def checkClient(self):
+        pass
+
+    def allClients(self):
+        pass
+
+    def a_Client(self):
+        pass
+
+    def updateClient(self):
+        pass
+
+class ItemDB:
+    def in_newItem(self):
+        pass
+
+    def checkItem(self):
+        pass
+
+    def allItems(self):
+        pass
+
+    def a_item(self):
+        pass
+
+    def updateItem(self):
+        pass
+
+class BillingDB:
+    ######### IN = Ingress in inventory#############
+    def IN_in_newBill(self):
+        pass
+
+    def INcheckBill(self):
+        pass
+
+    def INallBill(self):
+        pass
+
+    def IN_a_Bill(self):
+        pass
+
+    def INupdateBill(self):
+        pass
+############## OUT = Discharge from inventory #########
+    def OUT_in_newBill(self):
+        pass
+
+    def OUTcheckBill(self):
+        pass
+
+    def OUTallBill(self):
+        pass
+
+    def OUT_a_Bill(self):
+        pass
+
+    def OUTupdateBill(self):
+        pass
+
+
+class SearchDB:
+    pass
