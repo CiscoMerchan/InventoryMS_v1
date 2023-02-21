@@ -152,7 +152,19 @@ class SupplierDB:
         pass
 
     def allSuppliers(self):
-        pass
+        conn.autocommit = True
+        # Creating a cursor object
+        cursor = conn.cursor()
+        # INSERT
+        cursor.execute("SELECT * FROM inventory_suppliers ORDER BY id ASC; ")
+
+        # Get the last inserted id
+        """This return all the data in _users TABLE """
+        dataSuppliers = cursor.fetchall()
+
+        # Commit the changes to the database
+        conn.commit()
+        return dataSuppliers
 
     def a_Supplier(self):
         pass

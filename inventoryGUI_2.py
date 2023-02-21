@@ -6,14 +6,29 @@ from tkinter import ttk, messagebox, END, Text, Radiobutton
 import tkcalendar as tkcalendar
 from accesory import CreateToolTip
 # Import DATABASE
-from usersBD import UserDb
+from usersBD import UserDb, SupplierDB
 #Acces to _users TABLE
-collection = UserDb()
+user_collection = UserDb()
+supplier_collection = SupplierDB()
 from backend_user import User
 
 ID = ""
 LABELS = ("",12, '')
 class SecondWindow:
+    ##################################$$$$$$$$$$$$  SUPPLIER  $$$$$$$$$$$$$$$$#######################################
+    """ When user click on Show button this will display the whole data from inventory_suppliers TABLE"""
+    def showSupplier(self):
+        # 1- first clear the data in treeview (otherwise the data in treeview will be repeated)
+        for item in self.supplier_tree.get_children():
+            self.supplier_tree.delete(item)
+        # 2- fetch data from DB
+        allsuppliers = supplier_collection.allSuppliers()
+
+        for row in allsuppliers:
+            # 3- INSERTION OF VALUES FROM DB TO TREEVIEEW
+            self.supplier_tree.insert('', 'end', text=row[0], values=row[0:])
+
+    #################################################################################################################
 #######################################$$$$$$$$$$$$$  USER   $$$$$$$$$$$$$$$$$########################################
     """User data operation"""
     #User INSERT data
@@ -40,12 +55,12 @@ class SecondWindow:
             else:
                 # Data colleted and insert
                 print('else')
-                collection.user_data_collection(
+                user_collection.user_data_collection(
                     Name.lower(), LastName.lower(),Email
                 )
                 # return of the user id number
-                messagebox.showinfo(f"Your user ID: {str(collection.last_insert_id)}",
-                                    f"Welcome to Inventory {Name} {LastName} this is your User ID: {str(collection.last_insert_id)}. \n This number is your ID and is necessary to use")
+                messagebox.showinfo(f"Your user ID: {str(user_collection.last_insert_id)}",
+                                    f"Welcome to Inventory {Name} {LastName} this is your User ID: {str(user_collection.last_insert_id)}. \n This number is your ID and is necessary to use")
                 print('ultimo mensaje')
                 if True:
                     print('now deleted data')
@@ -69,7 +84,7 @@ class SecondWindow:
                 "User Update", f"For User ID: {idUser} Do you wan to update the email to: {Email}   ")
             if confirmation :
 
-                collection.updateUser(id=idUser,email=Email)
+                user_collection.updateUser(id=idUser, email=Email)
                 if True:
                     messagebox.showinfo('Message', f'User email is Updated')
                     self.userNameEntry.delete(0,END)
@@ -82,7 +97,7 @@ class SecondWindow:
         for item in self.user_tree.get_children():
             self.user_tree.delete(item)
         #2- fetch data from DB
-        allusers = collection.userAll()
+        allusers = user_collection.userAll()
 
         for row in allusers:
             #3- INSERTION OF VALUES FROM DB TO TREEVIEEW
@@ -387,32 +402,32 @@ class SecondWindow:
             25*i, f"Company {i}", f"Name {i}", i*45, f"email{i}")
             lis.append(suplist)
         print(lis)
-        # supplier_tree.insert('','end', text=itemlist[0], values=itemlist[0:])
+        # self.supplier_tree.insert('','end', text=itemlist[0], values=itemlist[0:])
         ######################## ITEM TREEVIEW
 
-        supplier_tree = ttk.Treeview(supplierTreeview, height=18, columns=(
+        self.supplier_tree = ttk.Treeview(supplierTreeview, height=18, columns=(
          "Supplier ID", "Company Name", "Agent", "Telephone", "Email"), show="headings")
-        supplier_tree.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
-        # supplier_tree.insert('', 'end', text=itemlist[0], values=lis[0:])   # Insert data into the treeview
+        self.supplier_tree.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
+        # self.supplier_tree.insert('', 'end', text=itemlist[0], values=lis[0:])   # Insert data into the treeview
         for row in lis:
-            supplier_tree.insert('', 'end', values=row)  # test Insert data into the treeview
+            self.supplier_tree.insert('', 'end', values=row)  # test Insert data into the treeview
         # Scrollbar for the treeview
-        supplier_tree_scroll = ttk.Scrollbar(supplierTreeview, orient="vertical", command=supplier_tree.yview)
+        supplier_tree_scroll = ttk.Scrollbar(supplierTreeview, orient="vertical", command=self.supplier_tree.yview)
         supplier_tree_scroll.pack(side=tkinter.LEFT, fill=tkinter.Y)
-        supplier_tree.configure(yscrollcommand=supplier_tree_scroll.set)
+        self.supplier_tree.configure(yscrollcommand=supplier_tree_scroll.set)
         ##### Heading of the treeview
-        supplier_tree.heading(0, text="Supplier ID", anchor='center')
-        supplier_tree.heading(1, text="Company Name", anchor='center')
-        supplier_tree.heading(2, text="Agent", anchor='center')
-        supplier_tree.heading(3, text="Telephone", anchor='center')
-        supplier_tree.heading(4, text="Email", anchor='center')
+        self.supplier_tree.heading(0, text="Supplier ID", anchor='center')
+        self.supplier_tree.heading(1, text="Company Name", anchor='center')
+        self.supplier_tree.heading(2, text="Agent", anchor='center')
+        self.supplier_tree.heading(3, text="Telephone", anchor='center')
+        self.supplier_tree.heading(4, text="Email", anchor='center')
 
         ##### Columns of the treeview
-        supplier_tree.column(0, width=150, anchor='center')
-        supplier_tree.column(1, width=300, anchor='center')
-        supplier_tree.column(2, width=300, anchor='center')
-        supplier_tree.column(3, width=100, anchor='center')
-        supplier_tree.column(4, width=250, anchor='center')
+        self.supplier_tree.column(0, width=150, anchor='center')
+        self.supplier_tree.column(1, width=300, anchor='center')
+        self.supplier_tree.column(2, width=300, anchor='center')
+        self.supplier_tree.column(3, width=100, anchor='center')
+        self.supplier_tree.column(4, width=250, anchor='center')
 
 
         ################################# SUPPLIERS TAB, LABELS AND ENTRIES
@@ -443,7 +458,7 @@ class SecondWindow:
         btn_InsertSupplier.pack()
         btn_UpdateSupplier = ttk.Button(supplierTab, text="Update", command="")
         btn_UpdateSupplier.pack(side=tkinter.RIGHT)
-        btn_SupplierShow = ttk.Button(supplierTab, text="Show", command="")
+        btn_SupplierShow = ttk.Button(supplierTab, text="Show", command= lambda : self.showSupplier())
         btn_SupplierShow.pack()
         self.notebook.add(supplierFrame, text="Supplier")
 #######################################################################
@@ -507,34 +522,34 @@ class SecondWindow:
 
         ################################# CLIENTS TAB, LABELS AND ENTRIES
 
-        lb_SupplierId = ttk.Label(clientTab, text="Supplier ID:")
-        lb_SupplierId.pack()
+        lb_ClientId = ttk.Label(clientTab, text="Supplier ID:")
+        lb_ClientId.pack()
         self.clientIdEntry = ttk.Entry(clientTab)
         self.clientIdEntry.pack()
-        lb_SupplierName = ttk.Label(clientTab, text="Company Name:")
-        lb_SupplierName.pack()
+        lb_ClientName = ttk.Label(clientTab, text="Company Name:")
+        lb_ClientName.pack()
         self.clientNameEntry = ttk.Entry(clientTab)
         self.clientNameEntry.pack()
-        lb_SupplierAgent = ttk.Label(clientTab, text="Agent Full Name:")
-        lb_SupplierAgent.pack()
+        lb_ClientAgent = ttk.Label(clientTab, text="Agent Full Name:")
+        lb_ClientAgent.pack()
         self.clientAgentEntry = ttk.Entry(clientTab)
         self.clientAgentEntry.pack()
-        lb_SupplierTelephone = ttk.Label(clientTab, text="Telephone:")
-        lb_SupplierTelephone.pack()
+        lb_ClientTelephone = ttk.Label(clientTab, text="Telephone:")
+        lb_ClientTelephone.pack()
         self.clientTelephoneEntry = ttk.Entry(clientTab)
         self.clientTelephoneEntry.pack()
-        lb_SupplierEmail = ttk.Label(clientTab, text="Email:")
-        lb_SupplierEmail.pack()
+        lb_ClientEmail = ttk.Label(clientTab, text="Email:")
+        lb_ClientEmail.pack()
         self.clientEmailEntry = ttk.Entry(clientTab)
         self.clientEmailEntry.pack()
 
         ###BUTTONS
-        btn_InsertSupplier = ttk.Button(clientTab, text="Insert", command="")
-        btn_InsertSupplier.pack()
-        btn_UpdateSupplier = ttk.Button(clientTab, text="Update", command="")
-        btn_UpdateSupplier.pack(side=tkinter.RIGHT)
-        btn_SupplierShow = ttk.Button(clientTab, text="Show", command="")
-        btn_SupplierShow.pack()
+        btn_InsertClient = ttk.Button(clientTab, text="Insert", command="")
+        btn_InsertClient.pack()
+        btn_UpdateClient = ttk.Button(clientTab, text="Update", command="")
+        btn_UpdateClient.pack(side=tkinter.RIGHT)
+        btn_ClientShow = ttk.Button(clientTab, text="Show", command="")
+        btn_ClientShow.pack()
         self.notebook.add(clientFrame, text="Client")
 
 ###############################################################
@@ -581,7 +596,7 @@ class SecondWindow:
         self.user_tree.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
 
         """Display in the treeview all the data from the _users TABLE """
-        allusers = collection.userAll()
+        allusers = user_collection.userAll()
         for row in allusers:
 
             # INSERTION OF VALUES FROM DB TO TREEVIEEW
