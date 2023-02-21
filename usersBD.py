@@ -145,8 +145,32 @@ class UserDb:
     #
 
 class SupplierDB:
-    def in_newSupplier(self):
-        pass
+    """Insert new supplier in inventory_suppliers TABLE """
+    def in_newSupplier(self, id,companyName,companyAgent,agentPhone,agentEmail):
+        conn.autocommit = True
+        # Creating a cursor object
+        cursor = conn.cursor()
+        # INSERT
+        cursor.execute(
+            f"INSERT INTO  inventory_suppliers (id, supplier_company_name, supplier_company_agent, supplier_agent_phone, supplier_agent_email) VALUES('{id}', '{companyName}', '{companyAgent}', '{agentPhone}', '{agentEmail}') RETURNING id ")
+
+        # Get the last inserted id
+        """This return in user_window.py where the messagebox to let know to the user their user ID number alocated by the DB """
+        insertedSupplier_id = cursor.fetchone()[0]
+
+        # Commit the changes to the database
+        conn.commit()
+        #possibilite to have the ID of the last inserted Supplier
+        return insertedSupplier_id
+              # Close the cursor and connection
+        # cursor.close()
+        # conn.close()
+        print("Supplier data been created successfully in inventory_suppliers TABLE  ")
+
+
+
+    # The porpuse of this funtion is that after the data is Inserted back to fetch the entered data and returned
+    # to the GUI but this time from the DB and not from the entered data directly entered ba the User
 
     def checkSupplier(self):
         pass

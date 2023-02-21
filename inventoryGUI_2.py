@@ -28,6 +28,34 @@ class SecondWindow:
             # 3- INSERTION OF VALUES FROM DB TO TREEVIEEW
             self.supplier_tree.insert('', 'end', text=row[0], values=row[0:])
 
+    def insertSupplier(self):
+        #Entries data
+        sup_Id = self.supplierIdEntry.get()
+        sup_Name = self.supplierNameEntry.get()
+        sup_Agent = self.supplierAgentEntry.get()
+        sup_Phone = self.supplierTelephoneEntry.get()
+        sup_Email = self.supplierEmailEntry.get()
+
+        # check if any entry case is empty
+        if (sup_Id =='' or sup_Name  =='' or sup_Agent  =='' or
+            sup_Phone  =='' or sup_Email  =='') :
+            messagebox.showerror("Error","All the entry case must be filled!")
+        # if all the data is correct
+        else:
+            messagebox.askyesno('Confirm', f"Do you want to add New Supplier \n\n\n Id: {sup_Id}\n\n"
+                                           f"Company: {sup_Name} \n\n Agent: {sup_Agent} \n\n Telephone: {sup_Phone} \n\n"
+                                           f"Email: {sup_Email}")
+            supplier_collection.in_newSupplier(
+                sup_Id,sup_Name,sup_Agent,sup_Phone,sup_Email
+            )
+            # this can be used to let know the user that the data of this id have been well inserted. With a messagebox
+            print(supplier_collection.in_newSupplier)
+            if supplier_collection.in_newSupplier:
+                self.supplierIdEntry.delete(0, END)
+                self.supplierNameEntry.delete(0, END)
+                self.supplierAgentEntry.delete(0, END)
+                self.supplierTelephoneEntry.delete(0, END)
+                self.supplierEmailEntry.delete(0, END)
     #################################################################################################################
 #######################################$$$$$$$$$$$$$  USER   $$$$$$$$$$$$$$$$$########################################
     """User data operation"""
@@ -395,22 +423,20 @@ class SecondWindow:
         lb_title = ttk.Label(supplierTopTab, text='Item Name')
         lb_title.pack(padx=10)
         #####################################################
-        ###############test insert in treeview
-        lis = []
-        for i in range(1, 50):
-            suplist = (
-            25*i, f"Company {i}", f"Name {i}", i*45, f"email{i}")
-            lis.append(suplist)
-        print(lis)
-        # self.supplier_tree.insert('','end', text=itemlist[0], values=itemlist[0:])
+
+
         ######################## ITEM TREEVIEW
 
         self.supplier_tree = ttk.Treeview(supplierTreeview, height=18, columns=(
          "Supplier ID", "Company Name", "Agent", "Telephone", "Email"), show="headings")
         self.supplier_tree.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
-        # self.supplier_tree.insert('', 'end', text=itemlist[0], values=lis[0:])   # Insert data into the treeview
-        for row in lis:
-            self.supplier_tree.insert('', 'end', values=row)  # test Insert data into the treeview
+        """Display in the treeview all the data from the inventory_suppliers TABLE """
+        # fetch data from DB
+        allsuppliers = supplier_collection.allSuppliers()
+
+        for row in allsuppliers:
+            # - INSERTION OF VALUES FROM DB TO TREEVIEEW
+            self.supplier_tree.insert('', 'end', text=row[0], values=row[0:])
         # Scrollbar for the treeview
         supplier_tree_scroll = ttk.Scrollbar(supplierTreeview, orient="vertical", command=self.supplier_tree.yview)
         supplier_tree_scroll.pack(side=tkinter.LEFT, fill=tkinter.Y)
@@ -454,7 +480,7 @@ class SecondWindow:
         self.supplierEmailEntry.pack()
 
         ###BUTTONS
-        btn_InsertSupplier = ttk.Button(supplierTab, text="Insert", command="")
+        btn_InsertSupplier = ttk.Button(supplierTab, text="Insert", command=lambda : self.insertSupplier())
         btn_InsertSupplier.pack()
         btn_UpdateSupplier = ttk.Button(supplierTab, text="Update", command="")
         btn_UpdateSupplier.pack(side=tkinter.RIGHT)
