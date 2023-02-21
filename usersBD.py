@@ -143,7 +143,9 @@ class UserDb:
     # except (Exception, psycopg2.Error) as error:
     #     # callback(False)
     #
+############################################################################################
 
+##############################################################################################
 class SupplierDB:
     """Insert new supplier in inventory_suppliers TABLE """
     def in_newSupplier(self, id,companyName,companyAgent,agentPhone,agentEmail):
@@ -167,11 +169,6 @@ class SupplierDB:
         # conn.close()
         print("Supplier data been created successfully in inventory_suppliers TABLE  ")
 
-
-
-    # The porpuse of this funtion is that after the data is Inserted back to fetch the entered data and returned
-    # to the GUI but this time from the DB and not from the entered data directly entered ba the User
-
     def checkSupplier(self):
         pass
 
@@ -183,7 +180,7 @@ class SupplierDB:
         cursor.execute("SELECT * FROM inventory_suppliers ORDER BY id ASC; ")
 
         # Get the last inserted id
-        """This return all the data in _users TABLE """
+        """This return all the data from inventory_suppliers TABLE """
         dataSuppliers = cursor.fetchall()
 
         # Commit the changes to the database
@@ -227,53 +224,90 @@ class SupplierDB:
         cursor.execute(query, query_values)
         conn.commit()
         cursor.close()
+############################################################################################
 
-
-
-    # def updateSupplier(self,id, Agent=None, Phone=None, Email=None):
-
-        # # SQL query with placeholders for the columns to update
-        # query = "UPDATE inventory_suppliers SET "
-        # placeholders = []
-        # if Agent is not None:
-        #     placeholders.append("supplier_company_agent = %s")
-        # if Phone is not None:
-        #     placeholders.append("supplier_agent_phone = %s")
-        # if Email is not None:
-        #     placeholders.append("supplier_agent_email = %s")
-        # query += ", ".join(placeholders)
-        # query += " WHERE id = %s;"
-        # values = []
-        # if Agent is not None:
-        #     values.append(Agent)
-        # if Phone is not None:
-        #     values.append(Phone)
-        # if Email is not None:
-        #     values.append(Email)
-        # values.append(id)
-        #
-        # # Execute the SQL query
-        # cursor = conn.cursor()
-        # cursor.execute(query, values)
-        # conn.commit()
-        # cursor.close()
-
+##############################################################################################
 class ClientDB:
-    def in_newClient(self):
-        pass
+    def in_newClient(self, id, companyName, companyAgent, agentPhone, agentEmail):
+        conn.autocommit = True
+        # Creating a cursor object
+        cursor = conn.cursor()
+        # INSERT
+        cursor.execute(
+        f"INSERT INTO  inventory_clients (id, client_company_name, client_company_agent, client_agent_phone, client_agent_email) VALUES('{id}', '{companyName}', '{companyAgent}', '{agentPhone}', '{agentEmail}') RETURNING id ")
+
+        # Get the last inserted id
+        """This return in  where the messagebox to let know to the user their user ID number alocated by the DB """
+        insertedClient_id = cursor.fetchone()[0]
+
+        # Commit the changes to the database
+        conn.commit()
+        # possibilite to have the ID of the last inserted Supplier
+
+        return insertedClient_id
+        # Close the cursor and connection
+        # cursor.close()
+        # conn.close()
+        print("Client data been created successfully in inventory_clients TABLE  ")
+
 
     def checkClient(self):
         pass
 
     def allClients(self):
-        pass
+        conn.autocommit = True
+        # Creating a cursor object
+        cursor = conn.cursor()
+        # INSERT
+        cursor.execute("SELECT * FROM inventory_clients ORDER BY id ASC; ")
+
+        # Get the last inserted id
+        """This return all the data from inventory_clients TABLE """
+        dataClients = cursor.fetchall()
+
+        # Commit the changes to the database
+        conn.commit()
+        return dataClients
 
     def a_Client(self):
         pass
 
-    def updateClient(self):
-        pass
+    def updateClient(self, id, Agent = None, Phone = None, Email = None):
+        # SQL query with placeholders for the columns to update
+        query = "UPDATE inventory_clients SET client_company_agent = %s, client_agent_phone = %s, client_agent_email = %s WHERE id = %s;"
 
+        # Select the current values for the other columns
+        select_query = "SELECT supplier_company_agent, supplier_agent_phone, supplier_agent_email FROM inventory_suppliers WHERE id = %s;"
+
+        # Collect the values for the SQL queries
+        update_values = []
+        if Agent is not None:
+            update_values.append(Agent)
+        else:
+            update_values.append(None)
+        if Phone is not None:
+            update_values.append(Phone)
+        else:
+            update_values.append(None)
+        if Email is not None:
+            update_values.append(Email)
+        else:
+            update_values.append(None)
+        update_values.append(id)
+
+        # Execute the SQL queries
+        cursor = conn.cursor()
+        cursor.execute(select_query, (id,))
+        existing_values = cursor.fetchone()
+        query_values = tuple(update_values)
+        if None in query_values:
+            query_values = tuple(v if v is not None else existing_values[i] for i, v in enumerate(query_values))
+        cursor.execute(query, query_values)
+        conn.commit()
+        cursor.close()
+############################################################################################
+
+##############################################################################################
 class ItemDB:
     def in_newItem(self):
         pass
@@ -289,7 +323,9 @@ class ItemDB:
 
     def updateItem(self):
         pass
+############################################################################################
 
+##############################################################################################
 class BillingDB:
     ######### IN = Ingress in inventory#############
     def IN_in_newBill(self):
@@ -322,6 +358,8 @@ class BillingDB:
     def OUTupdateBill(self):
         pass
 
+############################################################################################
 
+##############################################################################################
 class SearchDB:
     pass
