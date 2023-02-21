@@ -193,8 +193,70 @@ class SupplierDB:
     def a_Supplier(self):
         pass
 
-    def updateSupplier(self):
-        pass
+    # A function to update only the last 3 columns of a row
+    def updateSupplier(self, id, Agent=None, Phone=None, Email=None):
+        # SQL query with placeholders for the columns to update
+        query = "UPDATE inventory_suppliers SET supplier_company_agent = %s, supplier_agent_phone = %s, supplier_agent_email = %s WHERE id = %s;"
+
+        # Select the current values for the other columns
+        select_query = "SELECT supplier_company_agent, supplier_agent_phone, supplier_agent_email FROM inventory_suppliers WHERE id = %s;"
+
+        # Collect the values for the SQL queries
+        update_values = []
+        if Agent is not None:
+            update_values.append(Agent)
+        else:
+            update_values.append(None)
+        if Phone is not None:
+            update_values.append(Phone)
+        else:
+            update_values.append(None)
+        if Email is not None:
+            update_values.append(Email)
+        else:
+            update_values.append(None)
+        update_values.append(id)
+
+        # Execute the SQL queries
+        cursor = conn.cursor()
+        cursor.execute(select_query, (id,))
+        existing_values = cursor.fetchone()
+        query_values = tuple(update_values)
+        if None in query_values:
+            query_values = tuple(v if v is not None else existing_values[i] for i, v in enumerate(query_values))
+        cursor.execute(query, query_values)
+        conn.commit()
+        cursor.close()
+
+
+
+    # def updateSupplier(self,id, Agent=None, Phone=None, Email=None):
+
+        # # SQL query with placeholders for the columns to update
+        # query = "UPDATE inventory_suppliers SET "
+        # placeholders = []
+        # if Agent is not None:
+        #     placeholders.append("supplier_company_agent = %s")
+        # if Phone is not None:
+        #     placeholders.append("supplier_agent_phone = %s")
+        # if Email is not None:
+        #     placeholders.append("supplier_agent_email = %s")
+        # query += ", ".join(placeholders)
+        # query += " WHERE id = %s;"
+        # values = []
+        # if Agent is not None:
+        #     values.append(Agent)
+        # if Phone is not None:
+        #     values.append(Phone)
+        # if Email is not None:
+        #     values.append(Email)
+        # values.append(id)
+        #
+        # # Execute the SQL query
+        # cursor = conn.cursor()
+        # cursor.execute(query, values)
+        # conn.commit()
+        # cursor.close()
 
 class ClientDB:
     def in_newClient(self):

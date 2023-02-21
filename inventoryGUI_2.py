@@ -28,6 +28,7 @@ class SecondWindow:
             # 3- INSERTION OF VALUES FROM DB TO TREEVIEEW
             self.supplier_tree.insert('', 'end', text=row[0], values=row[0:])
 
+    """Insert new Supplier. button INSERT"""
     def insertSupplier(self):
         #Entries data
         sup_Id = self.supplierIdEntry.get()
@@ -56,6 +57,32 @@ class SecondWindow:
                 self.supplierAgentEntry.delete(0, END)
                 self.supplierTelephoneEntry.delete(0, END)
                 self.supplierEmailEntry.delete(0, END)
+
+    """Update Supplier Agent, Telephone or/and Email . button UPDATE"""
+    def update_supplier(self):
+        sup_Id = self.supplierIdEntry.get()
+        sup_Agent = self.supplierAgentEntry.get()
+        sup_Phone = self.supplierTelephoneEntry.get()
+        sup_Email = self.supplierEmailEntry.get()
+        #supplier ID is mandatory
+        if (sup_Id == "" or sup_Agent == "" or sup_Phone == "" or sup_Email == "") :
+            messagebox.showerror("ERROR", "No empty case in: Supplieer ID, Agent Full name, Telephone and Email  entries" )
+        else:
+            #Confirme the change to update
+            confirmeUpdate = messagebox.askokcancel("Confirmation", f" For the Supplier ID {sup_Id}, the new company details are: \n\n"
+                                                f"Agent: {sup_Agent}\n\n Telephone: {sup_Phone} and\n\n Email: {sup_Email}" )
+            if confirmeUpdate:
+                supplier_collection.updateSupplier(sup_Id,sup_Agent,sup_Phone,sup_Email)
+                #data have been updated
+                messagebox.showinfo('Info', 'Data save ')
+                #After the data have been updated clear the Entry widgets
+                self.supplierIdEntry.delete(0, END)
+                self.supplierNameEntry.delete(0, END)
+                self.supplierAgentEntry.delete(0, END)
+                self.supplierTelephoneEntry.delete(0, END)
+                self.supplierEmailEntry.delete(0, END)
+            else:
+                messagebox.showwarning("Info", f"No change have been made for Suppplier id: {sup_Id}")
     #################################################################################################################
 #######################################$$$$$$$$$$$$$  USER   $$$$$$$$$$$$$$$$$########################################
     """User data operation"""
@@ -414,14 +441,29 @@ class SecondWindow:
         supplierTreeview = ttk.Frame(supplierFrame)
         supplierTreeview.pack(side=tkinter.RIGHT)
         ###### TEST For Labels at the top of the treevieww to render information#########
-        lb_title = ttk.Label(supplierTopTab, text='Itemfgsf Name')
+
+        lb_title = ttk.Label(supplierTopTab, text='Selection:', font=('',16,'bold'))
         lb_title.pack()
-        lb_title = ttk.Label(supplierTopTab, text='Itemfgsf ')
-        lb_title.pack(side=tkinter.RIGHT, padx=10)
-        lb_title = ttk.Label(supplierTopTab, text=' Name')
-        lb_title.pack(side=tkinter.LEFT, padx=10)
-        lb_title = ttk.Label(supplierTopTab, text='Item Name')
-        lb_title.pack(padx=10)
+        lb_1Title = ttk.Label(supplierTopTab, text='Id: ', font=('',12,'bold'))
+        lb_1Title.pack(side=tkinter.LEFT )
+        lb_titleSupId = ttk.Label(supplierTopTab, text='', background='white', font=('',14,'bold'))
+        lb_titleSupId.pack(side=tkinter.LEFT )
+        lb_2Title = ttk.Label(supplierTopTab, text='     Name:', font=('',12,'bold'))
+        lb_2Title.pack(side=tkinter.LEFT)
+        lb_titleSupName = ttk.Label(supplierTopTab, text='',background='white')
+        lb_titleSupName.pack(side=tkinter.LEFT)
+        lb_3Title = ttk.Label(supplierTopTab, text='     Agent:', font=('',12,'bold'))
+        lb_3Title.pack(side=tkinter.LEFT)
+        lb_titleSupAgent = ttk.Label(supplierTopTab, text='',background='white')
+        lb_titleSupAgent.pack(side=tkinter.LEFT)
+        lb_4Title = ttk.Label(supplierTopTab, text='     Telephone:', font=('',12,'bold'))
+        lb_4Title.pack(side=tkinter.LEFT)
+        lb_titleSupPhone = ttk.Label(supplierTopTab, text='',background='white')
+        lb_titleSupPhone.pack(side=tkinter.LEFT)
+        lb_4Title = ttk.Label(supplierTopTab, text='     Email:', font=('', 12, 'bold'))
+        lb_4Title.pack(side=tkinter.LEFT)
+        lb_titleSupEmail = ttk.Label(supplierTopTab, text='', background='white')
+        lb_titleSupEmail.pack(side=tkinter.LEFT)
         #####################################################
 
 
@@ -454,7 +496,49 @@ class SecondWindow:
         self.supplier_tree.column(2, width=300, anchor='center')
         self.supplier_tree.column(3, width=100, anchor='center')
         self.supplier_tree.column(4, width=250, anchor='center')
+        ####Select items from the treeview###
+        ######################################
+        """this methods is to select,fetch and return data from the clicked row in the treeview """
 
+        def treeview_select(event):
+            # FETCH SELECTED ROW
+            select_SupplierId = event.widget.selection()[0]
+            # FETCH ALL VALUES OF THE ROW
+            select_SupplierIdValue = event.widget.item(select_SupplierId)['values']
+            """Configuration of the labes at the topframe. When the user clicks one of the row in the treeview the data 
+            from the clicked row will be display at the top. thE VALUE ARE INDEXED"""
+
+            """Rendering the selected row in the treeview into the Entry widgets"""
+            # Supplier ID
+            self.supplierIdEntry.delete(0, END)
+            self.supplierIdEntry.insert(0, select_SupplierIdValue[0])
+            # SUPPLIER NAME
+            self.supplierNameEntry.delete(0, END)
+            self.supplierNameEntry.insert(0, select_SupplierIdValue[1])
+            # AGENT SUPPLIER
+            self.supplierAgentEntry.delete(0, END)
+            self.supplierAgentEntry.insert(0, select_SupplierIdValue[2])
+            # SUPPLIER PHONE
+            self.supplierTelephoneEntry.delete(0, END)
+            self.supplierTelephoneEntry.insert(0, select_SupplierIdValue[3])
+            # SUPPLIER EMAIL
+            self.supplierEmailEntry.delete(0, END)
+            self.supplierEmailEntry.insert(0, select_SupplierIdValue[4])
+            """Render selected row in the treeviw at the TopFrame"""
+            #Supplier ID
+            lb_titleSupId.config(text=select_SupplierIdValue[0])
+            #Supplier Name
+            lb_titleSupName.config(text=select_SupplierIdValue[1])
+            #Supplier Agent
+            lb_titleSupAgent.config(text=select_SupplierIdValue[2])
+            #Supplier Phone
+            lb_titleSupPhone.config(text=select_SupplierIdValue[3])
+            #Supplier Email
+            lb_titleSupEmail.config(text=select_SupplierIdValue[4])
+            return select_SupplierIdValue
+
+        self.supplier_tree.bind('<<TreeviewSelect>>', treeview_select)
+        #######################################################
 
         ################################# SUPPLIERS TAB, LABELS AND ENTRIES
 
@@ -482,7 +566,7 @@ class SecondWindow:
         ###BUTTONS
         btn_InsertSupplier = ttk.Button(supplierTab, text="Insert", command=lambda : self.insertSupplier())
         btn_InsertSupplier.pack()
-        btn_UpdateSupplier = ttk.Button(supplierTab, text="Update", command="")
+        btn_UpdateSupplier = ttk.Button(supplierTab, text="Update", command=lambda : self.update_supplier())
         btn_UpdateSupplier.pack(side=tkinter.RIGHT)
         btn_SupplierShow = ttk.Button(supplierTab, text="Show", command= lambda : self.showSupplier())
         btn_SupplierShow.pack()
