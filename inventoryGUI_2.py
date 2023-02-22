@@ -84,6 +84,13 @@ class SecondWindow:
                 self.supplierEmailEntry.delete(0, END)
             else:
                 messagebox.showwarning("Info", f"No change have been made for Suppplier id: {sup_Id}")
+    #Funtion to clear the Entry boxes
+    def clearSupplier(self):
+        self.supplierIdEntry.delete(0, END)
+        self.supplierNameEntry.delete(0, END)
+        self.supplierAgentEntry.delete(0, END)
+        self.supplierTelephoneEntry.delete(0, END)
+        self.supplierEmailEntry.delete(0, END)
 #####################################################################################################################
 
     ##################################$$$$$$$$$$$$ CLIENTS $$$$$$$$$$$$$$$$#######################################
@@ -644,12 +651,23 @@ class SecondWindow:
         self.supplierEmailEntry.pack()
 
         ###BUTTONS
+        #Insert button
         btn_InsertSupplier = ttk.Button(supplierTab, text="Insert", command=lambda : self.insertSupplier())
-        btn_InsertSupplier.pack()
+        btn_InsertSupplier.pack(side=tkinter.TOP)
+        btn_InsertSupplier.bind("<Return>", lambda event: self.insertSupplier()(btn_InsertSupplier["Insert"]))
+        #Update button
         btn_UpdateSupplier = ttk.Button(supplierTab, text="Update", command=lambda : self.update_supplier())
-        btn_UpdateSupplier.pack(side=tkinter.RIGHT)
+        btn_UpdateSupplier.pack(side=tkinter.TOP)
+        btn_UpdateSupplier.bind("<Return>", lambda event: self.update_supplier()(btn_UpdateSupplier["Update"]))
+        #Show button
         btn_SupplierShow = ttk.Button(supplierTab, text="Show", command= lambda : self.showSupplier())
-        btn_SupplierShow.pack()
+        btn_SupplierShow.pack(side=tkinter.LEFT)
+        btn_SupplierShow.bind("<Return>", lambda event: self.showSupplier()(btn_InsertSupplier["Show"]))
+        #Clear button
+        btn_SupplierClear = ttk.Button(supplierTab, text="Clear", command=lambda: self.clearSupplier())
+        btn_SupplierClear.pack()
+        btn_SupplierClear.bind("<Return>", lambda event: self.clearSupplier()(btn_SupplierClear["Clear"]))
+        #END
         self.notebook.add(supplierFrame, text="Supplier")
 #######################################################################
         """CLIENT"""
