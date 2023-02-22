@@ -16,9 +16,100 @@ from backend_user import User
 ID = ""
 LABELS = ("",12, '')
 class SecondWindow:
+    ##################################$$$$$$$$$$$$  ITEMS  $$$$$$$$$$$$$$$$#######################################
+    """ When user click on Show button this will display the whole data from inventory_suppliers TABLE"""
+
+    def showItem(self):
+        # 1- first clear the data in treeview (otherwise the data in treeview will be repeated)
+        for item in self.supplier_tree.get_children():
+            self.supplier_tree.delete(item)
+        # 2- fetch data from DB
+        allsuppliers = supplier_collection.allSuppliers()
+
+        for row in allsuppliers:
+            # 3- INSERTION OF VALUES FROM DB TO TREEVIEEW
+            self.supplier_tree.insert('', 'end', text=row[0], values=row[0:])
+
+    """Insert new Supplier. button INSERT"""
+
+    def insertItem(self):
+        # Entries data
+        itemCode = self.itemCodeEntry.get()
+        itemName = self.itemNameEntry.get()
+        itemDescription = self.itemDescriptionEntry.get()
+        itemSupId = self.itemSupplierIdEntry.get()
+        itemQty = self.itemQuantityEntry.get()
+        itemPrice = self.itemPriceEntry.get()
+        itemMinStock = self.itemMinStockEntry.get()
+        itemLocation = self.itemLocationEntry.get()
+
+
+        # check if any entry case is empty
+        if (itemCode == '' or itemName == '' or itemDescription == '' or itemSupId =='' or itemQty == '' or
+                itemPrice == '' or itemMinStock == '' or itemLocation == ""):
+            messagebox.showerror("Error", "All the entry case must be filled!")
+        # if all the data is correct
+        else:
+            messagebox.askyesno('Confirm', f"Do you want to add New Item \n\n\n Code: {itemCode}\n\n"
+                                           f"Item name: {itemName} \n\n Item Description: {itemDescription} \n\n "
+                                           f"Item Supplier ID: {itemSupId} \n\n Quantity: {itemQty} \n\n "
+                                           f"Price: {itemPrice} \n\n Item Min.Stock{itemMinStock} \n\n "
+                                           f"Item Location: {itemLocation}")
+            supplier_collection.in_newSupplier(
+                itemCode, itemName, itemDescription, itemSupId, itemQty, itemPrice, itemMinStock, itemLocation
+            )
+            # this can be used to let know the user that the data of this id have been well inserted. With a messagebox
+            print(supplier_collection.in_newSupplier)
+            if supplier_collection.in_newSupplier:
+
+                self.itemCodeEntry.delete(0, END)
+                self.itemNameEntry.delete(0, END)
+                self.itemDescriptionEntry.delete(0, END)
+                self.itemSupplierIdEntry.delete(0, END)
+                self.itemQuantityEntry.delete(0, END)
+                self.itemPriceEntry.delete(0, END)
+                self.itemMinStockEntry.delete(0, END)
+                self.itemLocationEntry.delete(0, END)
+
+    """Update Supplier Agent, Telephone or/and Email . button UPDATE"""
+
+    def update_Item(self):
+        sup_Id = self.supplierIdEntry.get()
+        sup_Agent = self.supplierAgentEntry.get()
+        sup_Phone = self.supplierTelephoneEntry.get()
+        sup_Email = self.supplierEmailEntry.get()
+        # supplier ID is mandatory
+        if (sup_Id == "" or sup_Agent == "" or sup_Phone == "" or sup_Email == ""):
+            messagebox.showerror("ERROR",
+                                 "No empty case in: Supplieer ID, Agent Full name, Telephone and Email  entries")
+        else:
+            # Confirme the change to update
+            confirmeUpdate = messagebox.askokcancel("Confirmation",
+                                                    f" For the Supplier ID {sup_Id}, the new company details are: \n\n"
+                                                    f"Agent: {sup_Agent}\n\n Telephone: {sup_Phone} and\n\n Email: {sup_Email}")
+            if confirmeUpdate:
+                supplier_collection.updateSupplier(sup_Id, sup_Agent, sup_Phone, sup_Email)
+                # data have been updated
+                messagebox.showinfo('Info', 'Data save ')
+                # After the data have been updated clear the Entry widgets
+                self.supplierIdEntry.delete(0, END)
+                self.supplierNameEntry.delete(0, END)
+                self.supplierAgentEntry.delete(0, END)
+                self.supplierTelephoneEntry.delete(0, END)
+                self.supplierEmailEntry.delete(0, END)
+            else:
+                messagebox.showwarning("Info", f"No change have been made for Suppplier id: {sup_Id}")
+
+    # Funtion to clear the Entry boxes
+    def clearItem(self):
+        self.supplierIdEntry.delete(0, END)
+        self.supplierNameEntry.delete(0, END)
+        self.supplierAgentEntry.delete(0, END)
+        self.supplierTelephoneEntry.delete(0, END)
+        self.supplierEmailEntry.delete(0, END)
     ##################################$$$$$$$$$$$$  SUPPLIER  $$$$$$$$$$$$$$$$#######################################
     """ When user click on Show button this will display the whole data from inventory_suppliers TABLE"""
-    def showSupplier(self):
+    def showItem(self):
         # 1- first clear the data in treeview (otherwise the data in treeview will be repeated)
         for item in self.supplier_tree.get_children():
             self.supplier_tree.delete(item)
@@ -475,10 +566,10 @@ class SecondWindow:
         lb_ItemDescription.pack()
         self.itemDescriptionEntry = ttk.Entry(itemTab)
         self.itemDescriptionEntry.pack()
-        lb_ItemDescription = ttk.Label(itemTab, text="Description")
-        lb_ItemDescription.pack()
-        self.itemDescriptionEntry = ttk.Entry(itemTab)
-        self.itemDescriptionEntry.pack()
+        # lb_ItemDescription = ttk.Label(itemTab, text="Description")
+        # lb_ItemDescription.pack()
+        # self.itemDescriptionEntry = ttk.Entry(itemTab)
+        # self.itemDescriptionEntry.pack()
         lb_ItemSupplierId = ttk.Label(itemTab, text="Supplier ID:")
         lb_ItemSupplierId.pack()
         self.itemSupplierIdEntry = ttk.Entry(itemTab)
@@ -512,7 +603,7 @@ class SecondWindow:
         # Show button
         btn_ItemShow = ttk.Button(itemTab, text="Show", command=lambda: self.showItem())
         btn_ItemShow.pack(side=tkinter.LEFT)
-        btn_ItemShow.bind("<Return>", lambda event: self.showSupplier()(btn_InsertItem["Show"]))
+        btn_ItemShow.bind("<Return>", lambda event: self.showItem()(btn_InsertItem["Show"]))
         # Clear button
         btn_ItemClear = ttk.Button(itemTab, text="Clear", command=lambda: self.clearItem())
         btn_ItemClear.pack()

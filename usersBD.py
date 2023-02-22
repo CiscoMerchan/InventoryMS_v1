@@ -157,7 +157,7 @@ class SupplierDB:
             f"INSERT INTO  inventory_suppliers (id, supplier_company_name, supplier_company_agent, supplier_agent_phone, supplier_agent_email) VALUES('{id}', '{companyName}', '{companyAgent}', '{agentPhone}', '{agentEmail}') RETURNING id ")
 
         # Get the last inserted id
-        """This return in user_window.py where the messagebox to let know to the user their user ID number alocated by the DB """
+        """This return in where the messagebox to let know to the user their user ID number alocated by the DB """
         insertedSupplier_id = cursor.fetchone()[0]
 
         # Commit the changes to the database
@@ -309,8 +309,32 @@ class ClientDB:
 
 ##############################################################################################
 class ItemDB:
-    def in_newItem(self):
-        pass
+    def in_newItem(self, ItemCode, ItemName, ItemDescription, ItemSupplierId,
+                   ItemQuantity, ItemPrice, ItemMinStock, ItemLocation):
+
+        conn.autocommit = True
+        # Creating a cursor object
+        cursor = conn.cursor()
+        # INSERT
+        cursor.execute(
+        f"INSERT INTO  inventory_items ( code_id, item_name, item_description, supplier_id, item_available, item_price,"
+        f"created_user_id, item_created_date, updated_user_id, item_updated_date, item_min_stock, item_location) "
+        f"VALUES('{ItemCode}', '{ItemName}', '{ItemDescription}', '{ItemSupplierId}', '{ItemQuantity}', '{ItemPrice}',"
+        f" '{ItemMinStock}', '{ItemLocation}') RETURNING code ")
+
+        # Get the last inserted id
+        """This return where the messagebox to let know to the user their  ID number alocated by the DB """
+        insertedItem_Code = cursor.fetchone()[0]
+
+        # Commit the changes to the database
+        conn.commit()
+        # possibilite to have the ID of the last inserted Supplier
+
+        return insertedItem_Code
+    # Close the cursor and connection
+    # cursor.close()
+    # conn.close()
+    print("Supplier data been created successfully in inventory_items TABLE  ")
 
     def checkItem(self):
         pass
