@@ -501,13 +501,23 @@ class SecondWindow:
         self.itemLocationEntry.pack()
 
         ###BUTTONS
-        btn_InsertItem = ttk.Button(itemTab, text="Insert")
-        btn_InsertItem.pack()
-        btn_UpdateItem = ttk.Button(itemTab, text="Update")
-        btn_UpdateItem.pack(side=tkinter.RIGHT)
-        btn_ItemShow = ttk.Button(itemTab, text="Show")
-        btn_ItemShow.pack()
-
+        # Insert button
+        btn_InsertItem = ttk.Button(itemTab, text="Insert", command=lambda: self.insertItem())
+        btn_InsertItem.pack(side=tkinter.TOP)
+        btn_InsertItem.bind("<Return>", lambda event: self.insertItem()(btn_InsertItem["Insert"]))
+        # Update button
+        btn_UpdateItem = ttk.Button(itemTab, text="Update", command=lambda: self.update_Item())
+        btn_UpdateItem.pack(side=tkinter.TOP)
+        btn_UpdateItem.bind("<Return>", lambda event: self.update_Item()(btn_UpdateItem["Update"]))
+        # Show button
+        btn_ItemShow = ttk.Button(itemTab, text="Show", command=lambda: self.showItem())
+        btn_ItemShow.pack(side=tkinter.LEFT)
+        btn_ItemShow.bind("<Return>", lambda event: self.showSupplier()(btn_InsertItem["Show"]))
+        # Clear button
+        btn_ItemClear = ttk.Button(itemTab, text="Clear", command=lambda: self.clearItem())
+        btn_ItemClear.pack()
+        btn_ItemClear.bind("<Return>", lambda event: self.clearItem()(btn_ItemClear["Clear"]))
+        # END
         self.notebook.add(itemFrame, text="Items")
 
 
