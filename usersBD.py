@@ -310,7 +310,7 @@ class ClientDB:
 ##############################################################################################
 class ItemDB:
     def in_newItem(self, ItemCode, ItemName, ItemDescription, ItemSupplierId,
-                   ItemQuantity, ItemPrice, ItemMinStock, ItemLocation):
+                   ItemQuantity, ItemPrice, User, Date, ItemMinStock, ItemLocation):
 
         conn.autocommit = True
         # Creating a cursor object
@@ -318,9 +318,9 @@ class ItemDB:
         # INSERT
         cursor.execute(
         f"INSERT INTO  inventory_items ( code_id, item_name, item_description, supplier_id, item_available, item_price,"
-        f"created_user_id, item_created_date, updated_user_id, item_updated_date, item_min_stock, item_location) "
+        f"created_user_id, item_created_date, item_min_stock, item_location) "
         f"VALUES('{ItemCode}', '{ItemName}', '{ItemDescription}', '{ItemSupplierId}', '{ItemQuantity}', '{ItemPrice}',"
-        f" '{ItemMinStock}', '{ItemLocation}') RETURNING code ")
+        f" {User},'{Date}','{ItemMinStock}', '{ItemLocation}') RETURNING code_id ")
 
         # Get the last inserted id
         """This return where the messagebox to let know to the user their  ID number alocated by the DB """

@@ -2,20 +2,22 @@
 import tkinter
 from sys import path
 from tkinter import ttk, messagebox, END, Text, Radiobutton
-
 import tkcalendar as tkcalendar
+from datetime import datetime
 from accesory import CreateToolTip
 # Import DATABASE
-from usersBD import UserDb, SupplierDB, ClientDB
+from usersBD import UserDb, SupplierDB, ClientDB, ItemDB
 #Acces to _users TABLE
 client_collection = ClientDB()
 user_collection = UserDb()
 supplier_collection = SupplierDB()
+item_collection = ItemDB()
 from backend_user import User
 
 ID = ""
 LABELS = ("",12, '')
 class SecondWindow:
+
     ##################################$$$$$$$$$$$$  ITEMS  $$$$$$$$$$$$$$$$#######################################
     """ When user click on Show button this will display the whole data from inventory_suppliers TABLE"""
 
@@ -40,8 +42,10 @@ class SecondWindow:
         itemSupId = self.itemSupplierIdEntry.get()
         itemQty = self.itemQuantityEntry.get()
         itemPrice = self.itemPriceEntry.get()
+        dateIn = datetime.today().strftime('%m/%d/%Y')
         itemMinStock = self.itemMinStockEntry.get()
         itemLocation = self.itemLocationEntry.get()
+
 
 
         # check if any entry case is empty
@@ -50,13 +54,14 @@ class SecondWindow:
             messagebox.showerror("Error", "All the entry case must be filled!")
         # if all the data is correct
         else:
-            messagebox.askyesno('Confirm', f"Do you want to add New Item \n\n\n Code: {itemCode}\n\n"
+            messagebox.askyesno('Confirm', f"{self.user_name} Do you want to add New Item \n\n\n Code: {itemCode}\n\n"
                                            f"Item name: {itemName} \n\n Item Description: {itemDescription} \n\n "
                                            f"Item Supplier ID: {itemSupId} \n\n Quantity: {itemQty} \n\n "
                                            f"Price: {itemPrice} \n\n Item Min.Stock{itemMinStock} \n\n "
                                            f"Item Location: {itemLocation}")
-            supplier_collection.in_newSupplier(
-                itemCode, itemName, itemDescription, itemSupId, itemQty, itemPrice, itemMinStock, itemLocation
+            item_collection.in_newItem(
+                itemCode, itemName, itemDescription, itemSupId, int(itemQty), itemPrice,int(self.user_id),
+                dateIn, int(itemMinStock), itemLocation
             )
             # this can be used to let know the user that the data of this id have been well inserted. With a messagebox
             print(supplier_collection.in_newSupplier)
@@ -483,7 +488,7 @@ class SecondWindow:
 
 
         ###BUTTONS
-        btn_InsertItem = ttk.Button(BillingTab, text="Insert")
+        btn_InsertItem = ttk.Button(BillingTab, text="Insert", command = lambda : self.insertItem())
         btn_InsertItem.pack()
         btn_UpdateItem = ttk.Button(BillingTab, text="Update")
         btn_UpdateItem.pack(side=tkinter.RIGHT)
