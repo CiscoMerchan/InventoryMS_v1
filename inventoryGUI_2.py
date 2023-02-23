@@ -23,18 +23,23 @@ class SecondWindow:
 
     def showItem(self):
         # 1- first clear the data in treeview (otherwise the data in treeview will be repeated)
-        for item in self.supplier_tree.get_children():
-            self.supplier_tree.delete(item)
+        for item in self.item_tree.get_children():
+            self.item_tree.delete(item)
         # 2- fetch data from DB
-        allsuppliers = supplier_collection.allSuppliers()
+        allitems = item_collection.allItems()
 
-        for row in allsuppliers:
+        for row in allitems:
             # 3- INSERTION OF VALUES FROM DB TO TREEVIEEW
-            self.supplier_tree.insert('', 'end', text=row[0], values=row[0:])
+            self.item_tree.insert('', 'end', text=row[0], values=row[0:])
 
     """Insert new Supplier. button INSERT"""
 
     def insertItem(self):
+        # logged user Name
+        username_in_the_system = self.user_name
+        # logged user ID
+        username_in_the_systemID = int(self.user_id)
+
         # Entries data
         itemCode = self.itemCodeEntry.get()
         itemName = self.itemNameEntry.get()
@@ -46,21 +51,19 @@ class SecondWindow:
         itemMinStock = self.itemMinStockEntry.get()
         itemLocation = self.itemLocationEntry.get()
 
-
-
         # check if any entry case is empty
         if (itemCode == '' or itemName == '' or itemDescription == '' or itemSupId =='' or itemQty == '' or
                 itemPrice == '' or itemMinStock == '' or itemLocation == ""):
             messagebox.showerror("Error", "All the entry case must be filled!")
         # if all the data is correct
         else:
-            messagebox.askyesno('Confirm', f"{self.user_name} Do you want to add New Item \n\n\n Code: {itemCode}\n\n"
+            messagebox.askyesno('Confirm', f"{username_in_the_system} Do you want to add New Item \n\n\n Code: {itemCode}\n\n"
                                            f"Item name: {itemName} \n\n Item Description: {itemDescription} \n\n "
                                            f"Item Supplier ID: {itemSupId} \n\n Quantity: {itemQty} \n\n "
                                            f"Price: {itemPrice} \n\n Item Min.Stock{itemMinStock} \n\n "
                                            f"Item Location: {itemLocation}")
             item_collection.in_newItem(
-                itemCode, itemName, itemDescription, itemSupId, int(itemQty), itemPrice,int(self.user_id),
+                itemCode, itemName, itemDescription, itemSupId, int(itemQty), itemPrice,username_in_the_systemID,
                 dateIn, int(itemMinStock), itemLocation
             )
             # this can be used to let know the user that the data of this id have been well inserted. With a messagebox
@@ -76,47 +79,68 @@ class SecondWindow:
                 self.itemMinStockEntry.delete(0, END)
                 self.itemLocationEntry.delete(0, END)
 
-    """Update Supplier Agent, Telephone or/and Email . button UPDATE"""
+    """Update Item description, Qty, price, updateBy, updateDate, minStock or/ and location . button UPDATE"""
 
     def update_Item(self):
-        sup_Id = self.supplierIdEntry.get()
-        sup_Agent = self.supplierAgentEntry.get()
-        sup_Phone = self.supplierTelephoneEntry.get()
-        sup_Email = self.supplierEmailEntry.get()
-        # supplier ID is mandatory
-        if (sup_Id == "" or sup_Agent == "" or sup_Phone == "" or sup_Email == ""):
+        # logged user Name
+        username_in_the_system = self.user_name
+        # logged user ID
+        username_in_the_systemID = int(self.user_id)
+
+        # Entries data
+        itemCode = self.itemCodeEntry.get()
+        itemDescription = self.itemDescriptionEntry.get()
+        itemQty = self.itemQuantityEntry.get()
+        itemPrice = self.itemPriceEntry.get()
+        dateUpdate = datetime.today().strftime('%m/%d/%Y')
+        itemMinStock = self.itemMinStockEntry.get()
+        itemLocation = self.itemLocationEntry.get()
+        #  Item code ID is mandatory
+        if (
+             itemCode == "" or itemDescription == "" or itemQty == "" or itemPrice == "" or
+             itemMinStock == "" or itemLocation == ""):
+            print( itemCode,itemDescription,itemQty,itemPrice,dateUpdate,itemMinStock,itemLocation)
             messagebox.showerror("ERROR",
-                                 "No empty case in: Supplieer ID, Agent Full name, Telephone and Email  entries")
+                                 "No empty case in: Item code, Description , Quantity, Price, Min.Stock or Location  entries")
         else:
             # Confirme the change to update
             confirmeUpdate = messagebox.askokcancel("Confirmation",
-                                                    f" For the Supplier ID {sup_Id}, the new company details are: \n\n"
-                                                    f"Agent: {sup_Agent}\n\n Telephone: {sup_Phone} and\n\n Email: {sup_Email}")
+                                                    f" {username_in_the_system}: You are Updating Item {itemCode} the :"
+                                                    f"\n\nDescription: {itemDescription}, \n\n Quantity: {itemQty} \n\n"
+                                                    f"Price: {itemPrice}\n\n Min. Stock: {itemMinStock} \n\n "
+                                                    f"Location: {itemLocation}")
             if confirmeUpdate:
-                supplier_collection.updateSupplier(sup_Id, sup_Agent, sup_Phone, sup_Email)
+                item_collection.updateItem(itemCode,itemDescription,itemQty,itemPrice,username_in_the_systemID,
+                                           dateUpdate,itemMinStock,itemLocation)
                 # data have been updated
-                messagebox.showinfo('Info', 'Data save ')
+                messagebox.showinfo('Info', 'Update save ')
                 # After the data have been updated clear the Entry widgets
-                self.supplierIdEntry.delete(0, END)
-                self.supplierNameEntry.delete(0, END)
-                self.supplierAgentEntry.delete(0, END)
-                self.supplierTelephoneEntry.delete(0, END)
-                self.supplierEmailEntry.delete(0, END)
+                self.itemCodeEntry.delete(0, END)
+                self.itemNameEntry.delete(0, END)
+                self.itemDescriptionEntry.delete(0, END)
+                self.itemSupplierIdEntry.delete(0, END)
+                self.itemQuantityEntry.delete(0, END)
+                self.itemPriceEntry.delete(0, END)
+                self.itemMinStockEntry.delete(0, END)
+                self.itemLocationEntry.delete(0, END)
             else:
-                messagebox.showwarning("Info", f"No change have been made for Suppplier id: {sup_Id}")
+                messagebox.showwarning("Info", f"No change have been made for Item code id: {itemCode}")
 
     # Funtion to clear the Entry boxes
     def clearItem(self):
-        self.supplierIdEntry.delete(0, END)
-        self.supplierNameEntry.delete(0, END)
-        self.supplierAgentEntry.delete(0, END)
-        self.supplierTelephoneEntry.delete(0, END)
-        self.supplierEmailEntry.delete(0, END)
+        self.itemCodeEntry.delete(0, END)
+        self.itemNameEntry.delete(0, END)
+        self.itemDescriptionEntry.delete(0, END)
+        self.itemSupplierIdEntry.delete(0, END)
+        self.itemQuantityEntry.delete(0, END)
+        self.itemPriceEntry.delete(0, END)
+        self.itemMinStockEntry.delete(0, END)
+        self.itemLocationEntry.delete(0, END)
     ##################################$$$$$$$$$$$$  SUPPLIER  $$$$$$$$$$$$$$$$#######################################
     """ When user click on Show button this will display the whole data from inventory_suppliers TABLE"""
-    def showItem(self):
+    def showSupplier(self):
         # 1- first clear the data in treeview (otherwise the data in treeview will be repeated)
-        for item in self.supplier_tree.get_children():
+        for item in self.item_tree.get_children():
             self.supplier_tree.delete(item)
         # 2- fetch data from DB
         allsuppliers = supplier_collection.allSuppliers()
@@ -511,53 +535,172 @@ class SecondWindow:
         itemTreeview = ttk.Frame(itemFrame)
         itemTreeview.pack(side=tkinter.RIGHT)
 ###### TEST For Labels at the top of the treevieww to render information#########
-        lb_title = ttk.Label(itemTopTab, text='Itemfgsf Name')
+
+        lb_title = ttk.Label(itemTopTab, text='Selection:', font=('',16,'bold'))
         lb_title.pack()
-        lb_title = ttk.Label(itemTopTab, text='Itemfgsf ')
-        lb_title.pack(side=tkinter.RIGHT,padx=10)
-        lb_title = ttk.Label(itemTopTab, text=' Name')
-        lb_title.pack(side=tkinter.LEFT, padx=10)
-        lb_title = ttk.Label(itemTopTab, text='Item Name')
-        lb_title.pack(padx=10)
+        lb_1Title = ttk.Label(itemTopTab, text='Code Id: ', font=('',12,'bold'))
+        lb_1Title.pack(side=tkinter.LEFT )
+        lb_titleItemId = ttk.Label(itemTopTab, text='', background='white', font=('',14,'bold'))
+        lb_titleItemId.pack(side=tkinter.LEFT )
+        lb_2Title = ttk.Label(itemTopTab, text='     Name:', font=('',12,'bold'))
+        lb_2Title.pack(side=tkinter.LEFT)
+        lb_titleItemName = ttk.Label(itemTopTab, text='',background='white')
+        lb_titleItemName.pack(side=tkinter.LEFT)
+        lb_3Title = ttk.Label(itemTopTab, text='     Description:', font=('',12,'bold'))
+        lb_3Title.pack(side=tkinter.LEFT)
+        lb_titleItemDescription = ttk.Label(itemTopTab, text='',background='white')
+        lb_titleItemDescription.pack(side=tkinter.LEFT)
+        lb_4Title = ttk.Label(itemTopTab, text='     Supplier ID:', font=('',12,'bold'))
+        lb_4Title.pack(side=tkinter.LEFT)
+        lb_titleItemSupId = ttk.Label(itemTopTab, text='',background='white')
+        lb_titleItemSupId.pack(side=tkinter.LEFT)
+        lb_4Title = ttk.Label(itemTopTab, text='     Quantity:', font=('', 12, 'bold'))
+        lb_4Title.pack(side=tkinter.LEFT)
+        lb_titleQty = ttk.Label(itemTopTab, text='', background='white')
+        lb_titleQty.pack(side=tkinter.LEFT)
+        lb_4Title = ttk.Label(itemTopTab, text='     Price:', font=('', 12, 'bold'))
+        lb_4Title.pack(side=tkinter.LEFT)
+        lb_titlePrice = ttk.Label(itemTopTab, text='', background='white')
+        lb_titlePrice.pack(side=tkinter.LEFT)
+        lb_4Title = ttk.Label(itemTopTab, text='     Created by:', font=('', 12, 'bold'))
+        lb_4Title.pack(side=tkinter.LEFT)
+        lb_titleCreateBy = ttk.Label(itemTopTab, text='', background='white')
+        lb_titleCreateBy.pack(side=tkinter.LEFT)
+        lb_4Title = ttk.Label(itemTopTab, text='     Created date:', font=('', 12, 'bold'))
+        lb_4Title.pack(side=tkinter.LEFT)
+        lb_titleCreateDate = ttk.Label(itemTopTab, text='', background='white')
+        lb_titleCreateDate.pack(side=tkinter.LEFT)
+        lb_4Title = ttk.Label(itemTopTab, text='     Update by:', font=('', 12, 'bold'))
+        lb_4Title.pack(side=tkinter.LEFT)
+        lb_titleUpdateBy = ttk.Label(itemTopTab, text='', background='white')
+        lb_titleUpdateBy.pack(side=tkinter.LEFT)
+        lb_4Title = ttk.Label(itemTopTab, text='     Update date:', font=('', 12, 'bold'))
+        lb_4Title.pack(side=tkinter.LEFT)
+        lb_titleUpdateDate = ttk.Label(itemTopTab, text='', background='white')
+        lb_titleUpdateDate.pack(side=tkinter.LEFT)
+        lb_4Title = ttk.Label(itemTopTab, text='     Min. Stock:', font=('', 12, 'bold'))
+        lb_4Title.pack(side=tkinter.LEFT)
+        lb_titleMinStock = ttk.Label(itemTopTab, text='', background='white')
+        lb_titleMinStock.pack(side=tkinter.LEFT)
+        lb_4Title = ttk.Label(itemTopTab, text='     Location:', font=('', 12, 'bold'))
+        lb_4Title.pack(side=tkinter.LEFT)
+        lb_titleLocation = ttk.Label(itemTopTab, text='', background='white')
+        lb_titleLocation.pack(side=tkinter.LEFT)
         #####################################################
-        ###############test insert in treeview
-        lis = []
-        for i in range(1,50):
-            itemlist = (f'{i}', "object", "Object to create objects", "supplier", 100+(i*4), f"${2+i}", 5*i, "level 1")
-            lis.append(itemlist)
-        print(lis)
-        # item_tree.insert('','end', text=itemlist[0], values=itemlist[0:])
-        ######################## ITEM TREEVIEW
 
-        item_tree = ttk.Treeview(itemTreeview, height=18, columns=("Item Code","Name", "Description","Supplier",
-                                                                   "Quantity","Price","Min. Stock", "Location"), show="headings")
-        item_tree.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
-        # item_tree.insert('', 'end', text=itemlist[0], values=lis[0:])   # Insert data into the treeview
-        for row in lis:
-                item_tree.insert('', 'end', values=row)#  test Insert data into the treeview
+        #####################################################
+        ############### insert in treeview
+        self.item_tree = ttk.Treeview(itemTreeview, height=18, columns=("Item Code","Name", "Description","Supplier ID",
+                                                                   "Quantity","Price","Created by", "Created Date",
+                                                                   "Update by", "Update date","Min. Stock", "Location"
+                                                                   ), show="headings")
+        self.item_tree.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
+        # fetch data from DB
+        allitems = item_collection.allItems()
+
+        for row in allitems:
+            # INSERTION OF VALUES FROM DB TO TREEVIEEW
+            self.item_tree.insert('', 'end', text=row[0], values=row[0:])
         #Scrollbar for the treeview
-        item_tree_scroll = ttk.Scrollbar(itemTreeview, orient="vertical", command=item_tree.yview)
+        item_tree_scroll = ttk.Scrollbar(itemTreeview, orient="vertical", command=self.item_tree.yview)
         item_tree_scroll.pack(side=tkinter.LEFT, fill=tkinter.Y)
-        item_tree.configure(yscrollcommand=item_tree_scroll.set)
+        self.item_tree.configure(yscrollcommand=item_tree_scroll.set)
         ##### Heading of the treeview
-        item_tree.heading(0, text="Item Code", anchor='center')
-        item_tree.heading(1, text="Name", anchor='center')
-        item_tree.heading(2, text="Description", anchor='center')
-        item_tree.heading(3, text="Supplier ID", anchor='center')
-        item_tree.heading(4, text="Quantity", anchor='center')
-        item_tree.heading(5, text="Price", anchor='center')
-        item_tree.heading(6, text="Min. Stock", anchor='center')
-        item_tree.heading(7, text="Location", anchor='center')
+        self.item_tree.heading(0, text="Item Code", anchor='center')
+        self.item_tree.heading(1, text="Name", anchor='center')
+        self.item_tree.heading(2, text="Description", anchor='center')
+        self.item_tree.heading(3, text="Supplier ID", anchor='center')
+        self.item_tree.heading(4, text="Quantity", anchor='center')
+        self.item_tree.heading(5, text="Price", anchor='center')
+        self.item_tree.heading(6, text="Created by", anchor='center')
+        self.item_tree.heading(7, text="Created date", anchor='center')
+        self.item_tree.heading(8, text="Update by", anchor='center')
+        self.item_tree.heading(9, text="Update date", anchor='center')
+        self.item_tree.heading(10, text="Min. Stock", anchor='center')
+        self.item_tree.heading(11, text="Location", anchor='center')
         ##### Columns of the treeview
-        item_tree.column(0, width=150, anchor='center')
-        item_tree.column(1, width=150, anchor='center')
-        item_tree.column(2, width=300, anchor='center')
-        item_tree.column(3, width=150, anchor='center')
-        item_tree.column(4, width=100, anchor='center')
-        item_tree.column(5, width=100, anchor='center')
-        item_tree.column(6, width=100, anchor='center')
-        item_tree.column(2, width=150, anchor='center')
+        self.item_tree.column(0, width=80, anchor='center')
+        self.item_tree.column(1, width=100, anchor='nw')
+        self.item_tree.column(2, width=200, anchor='nw')
+        self.item_tree.column(3, width=80, anchor='center')
+        self.item_tree.column(4, width=80, anchor='center')
+        self.item_tree.column(5, width=50, anchor='center')
+        self.item_tree.column(6, width=80, anchor='center')
+        self.item_tree.column(7, width=80, anchor='center')
+        self.item_tree.column(8, width=80, anchor='center')
+        self.item_tree.column(9, width=80, anchor='center')
+        self.item_tree.column(10, width=80, anchor='center')
+        self.item_tree.column(11, width=100, anchor='nw')
 
+        ####Select items from the treeview###
+        ######################################
+        """this methods is to select,fetch and return data from the clicked row in the treeview """
+
+        def treeview_select(event):
+            # FETCH SELECTED ROW
+            select_ItemId = event.widget.selection()[0]       # FETCH ALL VALUES OF THE ROW
+            print(select_ItemId)
+            select_ItemIdValue = event.widget.item(select_ItemId)['values']
+            print(select_ItemIdValue)
+            """Configuration of the labes at the topframe. When the user clicks one of the row in the treeview the data 
+            from the clicked row will be display at the top. thE VALUE ARE INDEXED"""
+
+            """Rendering the selected row in the treeview into the Entry widgets"""
+            # ITEM CODE
+            self.itemCodeEntry.delete(0, END)
+            self.itemCodeEntry.insert(0, select_ItemIdValue[0])
+            # ITEM NAME
+            self.itemNameEntry.delete(0, END)
+            self.itemNameEntry.insert(0, select_ItemIdValue[1])
+            # ITEM DESCRIPTION
+            self.itemDescriptionEntry.delete(0, END)
+            self.itemDescriptionEntry.insert(0, select_ItemIdValue[2])
+            # ITEM SUPPLIER ID
+            self.itemSupplierIdEntry.delete(0, END)
+            self.itemSupplierIdEntry.insert(0, select_ItemIdValue[3])
+            # ITEM QUANTITY
+            self.itemQuantityEntry.delete(0, END)
+            self.itemQuantityEntry.insert(0, select_ItemIdValue[4])
+            # ITEM PRICE
+            self.itemPriceEntry.delete(0, END)
+            self.itemPriceEntry.insert(0, select_ItemIdValue[5])
+            # ITEM MIN. STOCK
+            self.itemMinStockEntry.delete(0, END)
+            self.itemMinStockEntry.insert(0, select_ItemIdValue[10])
+            # ITEM LOCATION
+            self.itemLocationEntry.delete(0, END)
+            self.itemLocationEntry.insert(0, select_ItemIdValue[11])
+            ############################################
+            """Render selected row in the treeviw at the TopFrame"""
+            ############################################
+            # Code ID
+            lb_titleItemId.config(text=select_ItemIdValue[0])
+            # Item Name
+            lb_titleItemName.config(text=select_ItemIdValue[1])
+            # Item Description
+            lb_titleItemDescription.config(text=select_ItemIdValue[2])
+            # Supplier ID
+            lb_titleItemSupId.config(text=select_ItemIdValue[3])
+            # Quantity
+            lb_titleQty.config(text=select_ItemIdValue[4])
+            # Price
+            lb_titlePrice.config(text=select_ItemIdValue[5])
+            # Created by
+            lb_titleCreateBy.config(text=select_ItemIdValue[6])
+            # Created date
+            lb_titleCreateDate.config(text=select_ItemIdValue[7])
+            # Updated by
+            lb_titleUpdateBy.config(text=select_ItemIdValue[8])
+            # Updated date
+            lb_titleUpdateDate.config(text=select_ItemIdValue[9])
+            #Min.Stock
+            lb_titleMinStock.config(text=select_ItemIdValue[10])
+            # Location
+            lb_titleLocation.config(text=select_ItemIdValue[11])
+            return select_ItemIdValue
+
+        self.item_tree.bind('<<TreeviewSelect>>', treeview_select)
+        #######################################################
         ################################# ITEMS TAB, LABELS AND ENTRIES
         lb_ItemCode = ttk.Label(itemTab, text="Item Code:")
         lb_ItemCode.pack()
