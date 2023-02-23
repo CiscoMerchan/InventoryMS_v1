@@ -401,7 +401,7 @@ class ItemDB:
 
         # Execute the SQL queries
         cursor = conn.cursor()
-        cursor.execute(select_query, (id,))
+        cursor.execute(select_query, (code_id,))
         existing_values = cursor.fetchone()
         query_values = tuple(update_values)
         if None in query_values:
