@@ -6,17 +6,138 @@ import tkcalendar as tkcalendar
 from datetime import datetime
 from accesory import CreateToolTip
 # Import DATABASE
-from usersBD import UserDb, SupplierDB, ClientDB, ItemDB
+from usersBD import UserDb, SupplierDB, ClientDB, ItemDB, BillingDB
 #Acces to _users TABLE
 client_collection = ClientDB()
 user_collection = UserDb()
 supplier_collection = SupplierDB()
 item_collection = ItemDB()
+billing_collection = BillingDB()
 from backend_user import User
 
 ID = ""
 LABELS = ("",12, '')
 class SecondWindow:
+    ##################################$$$$$$$$$$$$  ITEMS  $$$$$$$$$$$$$$$$#######################################
+    """ When user click on Show button this will display the whole data from inventory_suppliers TABLE"""
+
+    def showItem(self):
+        # 1- first clear the data in treeview (otherwise the data in treeview will be repeated)
+        for item in self.item_tree.get_children():
+            self.item_tree.delete(item)
+        # 2- fetch data from DB
+        allitems = item_collection.allItems()
+
+        for row in allitems:
+            # 3- INSERTION OF VALUES FROM DB TO TREEVIEEW
+            self.item_tree.insert('', 'end', text=row[0], values=row[0:])
+
+    """Insert new Supplier. button INSERT"""
+
+    def insertItem(self):
+        # logged user Name
+        username_in_the_system = self.user_name
+        # logged user ID
+        username_in_the_systemID = int(self.user_id)
+
+        # Entries data
+        itemCode = self.itemCodeEntry.get()
+        itemName = self.itemNameEntry.get()
+        itemDescription = self.itemDescriptionEntry.get()
+        itemSupId = self.itemSupplierIdEntry.get()
+        itemQty = self.itemQuantityEntry.get()
+        itemPrice = self.itemPriceEntry.get()
+        dateIn = datetime.today().strftime('%m/%d/%Y')
+        itemMinStock = self.itemMinStockEntry.get()
+        itemLocation = self.itemLocationEntry.get()
+
+        # check if any entry case is empty
+        if (itemCode == '' or itemName == '' or itemDescription == '' or itemSupId == '' or itemQty == '' or
+                itemPrice == '' or itemMinStock == '' or itemLocation == ""):
+            messagebox.showerror("Error", "All the entry case must be filled!")
+        # if all the data is correct
+        else:
+            messagebox.askyesno('Confirm',
+                                f"{username_in_the_system} Do you want to add New Item \n\n\n Code: {itemCode}\n\n"
+                                f"Item name: {itemName} \n\n Item Description: {itemDescription} \n\n "
+                                f"Item Supplier ID: {itemSupId} \n\n Quantity: {itemQty} \n\n "
+                                f"Price: {itemPrice} \n\n Item Min.Stock{itemMinStock} \n\n "
+                                f"Item Location: {itemLocation}")
+            item_collection.in_newItem(
+                itemCode, itemName, itemDescription, itemSupId, int(itemQty), itemPrice, username_in_the_systemID,
+                dateIn, int(itemMinStock), itemLocation
+            )
+            # this can be used to let know the user that the data of this id have been well inserted. With a messagebox
+            print(supplier_collection.in_newSupplier)
+            if supplier_collection.in_newSupplier:
+                self.itemCodeEntry.delete(0, END)
+                self.itemNameEntry.delete(0, END)
+                self.itemDescriptionEntry.delete(0, END)
+                self.itemSupplierIdEntry.delete(0, END)
+                self.itemQuantityEntry.delete(0, END)
+                self.itemPriceEntry.delete(0, END)
+                self.itemMinStockEntry.delete(0, END)
+                self.itemLocationEntry.delete(0, END)
+
+    """Update Item description, Qty, price, updateBy, updateDate, minStock or/ and location . button UPDATE"""
+
+    def update_Item(self):
+        # logged user Name
+        username_in_the_system = self.user_name
+        # logged user ID
+        username_in_the_systemID = int(self.user_id)
+
+        # Entries data
+        itemCode = self.itemCodeEntry.get()
+        itemDescription = self.itemDescriptionEntry.get()
+        itemQty = self.itemQuantityEntry.get()
+        itemPrice = self.itemPriceEntry.get()
+        dateUpdate = datetime.today().strftime('%m/%d/%Y')
+        itemMinStock = self.itemMinStockEntry.get()
+        itemLocation = self.itemLocationEntry.get()
+        #  Item code ID is mandatory
+        if (
+                itemCode == "" or itemDescription == "" or itemQty == "" or itemPrice == "" or
+                itemMinStock == "" or itemLocation == ""):
+            print(itemCode, itemDescription, itemQty, itemPrice, dateUpdate, itemMinStock, itemLocation)
+            messagebox.showerror("ERROR",
+                                 "No empty case in: Item code, Description , Quantity, Price, Min.Stock or Location  entries")
+        else:
+            # Confirme the change to update
+            confirmeUpdate = messagebox.askokcancel("Confirmation",
+                                                    f" {username_in_the_system}: You are Updating Item {itemCode} the :"
+                                                    f"\n\nDescription: {itemDescription}, \n\n Quantity: {itemQty} \n\n"
+                                                    f"Price: {itemPrice}\n\n Min. Stock: {itemMinStock} \n\n "
+                                                    f"Location: {itemLocation}")
+            if confirmeUpdate:
+                item_collection.updateItem(itemCode, itemDescription, itemQty, itemPrice, username_in_the_systemID,
+                                           dateUpdate, itemMinStock, itemLocation)
+                # data have been updated
+                messagebox.showinfo('Info', 'Update save ')
+                # After the data have been updated clear the Entry widgets
+                self.itemCodeEntry.delete(0, END)
+                self.itemNameEntry.delete(0, END)
+                self.itemDescriptionEntry.delete(0, END)
+                self.itemSupplierIdEntry.delete(0, END)
+                self.itemQuantityEntry.delete(0, END)
+                self.itemPriceEntry.delete(0, END)
+                self.itemMinStockEntry.delete(0, END)
+                self.itemLocationEntry.delete(0, END)
+            else:
+                messagebox.showwarning("Info", f"No change have been made for Item code id: {itemCode}")
+
+    # Funtion to clear the Entry boxes
+    def clearItem(self):
+        self.itemCodeEntry.delete(0, END)
+        self.itemNameEntry.delete(0, END)
+        self.itemDescriptionEntry.delete(0, END)
+        self.itemSupplierIdEntry.delete(0, END)
+        self.itemQuantityEntry.delete(0, END)
+        self.itemPriceEntry.delete(0, END)
+        self.itemMinStockEntry.delete(0, END)
+        self.itemLocationEntry.delete(0, END)
+
+    ########################################################################################################
 
     ##################################$$$$$$$$$$$$  ITEMS  $$$$$$$$$$$$$$$$#######################################
     """ When user click on Show button this will display the whole data from inventory_suppliers TABLE"""
@@ -136,6 +257,9 @@ class SecondWindow:
         self.itemPriceEntry.delete(0, END)
         self.itemMinStockEntry.delete(0, END)
         self.itemLocationEntry.delete(0, END)
+
+    ##################################################################################################################
+
     ##################################$$$$$$$$$$$$  SUPPLIER  $$$$$$$$$$$$$$$$#######################################
     """ When user click on Show button this will display the whole data from inventory_suppliers TABLE"""
     def showSupplier(self):
@@ -408,7 +532,7 @@ class SecondWindow:
         BillingTab.pack(side=tkinter.LEFT)
         #### RIGHT FRAME FOR TREEVIEW AND SCROLLBAR ############################################
         BillingTreeview = ttk.Frame(BillingFrame)
-        BillingTreeview.pack(side=tkinter.RIGHT)
+        BillingTreeview.pack(side=tkinter.LEFT)
         ###### TEST For Labels at the top of the treevieww to render information#########
         lb_title = ttk.Label(BillingTopTab, text='User ID selected : ')
         lb_title.pack()
@@ -431,8 +555,8 @@ class SecondWindow:
         ######################## ITEM TREEVIEW
 
         Billing_tree = ttk.Treeview(BillingTreeview, height=18, columns=(
-            "Reference ID", "Type of Transaction", "Date", "Company ID", "Item ID", "Item Name", "Quantity", "Price",
-            "Discount", "Description", "UserID"), show="headings")
+            "Reference ID", "Entrance/Exit", "Company ID", "Item ID", "Item Name", "Quantity", "Price",
+            "Discount","Date","Created Date", "Description", "UserID"), show="headings")
         Billing_tree.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
         # item_tree.insert('', 'end', text=itemlist[0], values=lis[0:])   # Insert data into the treeview
         for row in lis:
@@ -443,37 +567,43 @@ class SecondWindow:
         Billing_tree.configure(yscrollcommand=Billing_tree_scroll.set)
         ##### Heading of the treeview
         Billing_tree.heading(0, text="Reference ID", anchor='center')
-        Billing_tree.heading(1, text="Type of Transacation", anchor='center')
-        Billing_tree.heading(2, text="Date", anchor='center')
-        Billing_tree.heading(3, text="Company ID", anchor='center')
-        Billing_tree.heading(4, text="Item ID", anchor='center')
-        Billing_tree.heading(5, text="Item Name", anchor='center')
-        Billing_tree.heading(6, text="Quantity", anchor='center')
-        Billing_tree.heading(7, text="Price", anchor='center')
-        Billing_tree.heading(8, text="Discount", anchor='center')
-        Billing_tree.heading(9, text="Description", anchor='center')
-        Billing_tree.heading(10, text="User ID", anchor='center')
+        Billing_tree.heading(1, text="Entrance/Exit", anchor='center')
+        Billing_tree.heading(2, text="Company ID", anchor='center')
+        Billing_tree.heading(3, text="Item ID", anchor='center')
+        Billing_tree.heading(4, text="Item Name", anchor='center')
+        Billing_tree.heading(5, text="Quantity", anchor='center')
+        Billing_tree.heading(6, text="Price", anchor='center')
+        Billing_tree.heading(7, text="Discount", anchor='center')
+        Billing_tree.heading(8, text="Date", anchor='center')
+        Billing_tree.heading(9, text="Created Date", anchor='center')
+        Billing_tree.heading(10, text="Description", anchor='center')
+        Billing_tree.heading(11, text="User ID", anchor='center')
         ##### Columns of the treeview
         Billing_tree.column(0, width=80, anchor='center')
         Billing_tree.column(1, width=80, anchor='center')
         Billing_tree.column(2, width=80, anchor='center')
         Billing_tree.column(3, width=80, anchor='center')
-        Billing_tree.column(4, width=70, anchor='center')
-        Billing_tree.column(5, width=100, anchor='center')
+        Billing_tree.column(4, width=80, anchor='center')
+        Billing_tree.column(5, width=80, anchor='center')
         Billing_tree.column(6, width=60, anchor='center')
-        Billing_tree.column(7, width=50, anchor='center')
-        Billing_tree.column(8, width=60, anchor='center')
-        Billing_tree.column(9, width=300, anchor='center')
-        Billing_tree.column(10, width=50, anchor='center')
+        Billing_tree.column(7, width=60, anchor='center')
+        Billing_tree.column(8, width=70, anchor='center')
+        Billing_tree.column(9, width=80, anchor='center')
+        Billing_tree.column(10, width=250, anchor='center')
+        Billing_tree.column(11, width=50, anchor='center')
 
-        ################################# ITEMS TAB, LABELS AND ENTRIES
-        inStock = tkinter.IntVar() #If this radiobutton check = 1. else = 0 RADIOBUTTON
-        outStock = tkinter.IntVar() #If this radiobutton check = 1 else = 0 RADIOBUTTON
-        inStock = tkinter.Radiobutton(BillingTab, text="In", variable=inStock, command="")
-        inStock.pack(side=tkinter.TOP)
-        outStock = tkinter.Radiobutton(BillingTab, text="Out", variable=outStock, command="")
-        outStock.pack()
-
+        ################################# BILLING TAB, RADIOBUTTON, LABELS AND ENTRIES
+        ###############RADIOBUTTON#################################################
+        BILLING = tkinter.StringVar() #RADIOBUTTON VARIABLE
+        BILLING.set('Entrance') #THE
+        def radioBtn():
+            print (BILLING.get())
+        inStock = tkinter.Radiobutton(BillingTab, text="Entrance", variable=BILLING, value = 'Entrance', command=lambda : radioBtn())
+        inStock.pack( side=tkinter.TOP)#anchor='w'
+        outStock = tkinter.Radiobutton(BillingTab, text="Exit", variable=BILLING,value = 'Exit', command=lambda : radioBtn())
+        outStock.pack(side=tkinter.TOP)#side=tkinter.TOP,
+        ##############################################################################
+        ################LABELS & ENTRIES############################################
         date = tkcalendar.DateEntry(BillingTab, width=10)
         date.pack()
         lb_ItemCode = ttk.Label(BillingTab, text="Reference Number:")
@@ -506,9 +636,9 @@ class SecondWindow:
         self.BillingPriceEntry.pack()
         lb_ItemMinStock = ttk.Label(BillingTab, text="Description:")
         lb_ItemMinStock.pack()
-        self.BillingMinStockEntry = tkinter.Text(BillingTab, width = 20, height = 3)
+        self.BillingMinStockEntry = tkinter.Text(BillingTab, width = 18, height = 1)
         self.BillingMinStockEntry.pack()
-
+    #######################################################################
 
 
         ###BUTTONS
