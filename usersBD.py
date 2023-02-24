@@ -417,8 +417,32 @@ class ItemDB:
 ##############################################################################################
 class BillingDB:
     ######### IN = Ingress in inventory#############
-    def IN_in_newBill(self):
-        pass
+    def IN_in_newBill(self,bill_id, entrance_or_exit, company_id, item_id, itemname, bill_quantity,
+                        bill_price, bill_discount, bill_date, bill_date_created, bill_description, user_id ):
+        conn.autocommit = True
+        # Creating a cursor object
+        cursor = conn.cursor()
+        # INSERT
+        cursor.execute(
+            f"INSERT INTO  inventory_transaction (bill_id, entrance_or_exit, company_id, item_id, itemname,"
+            f" bill_quantity, bill_price, bill_discount, bill_date, bill_date_created, bill_description, user_id  ) "
+            f"VALUES('{bill_id}', '{entrance_or_exit}', '{company_id}', '{item_id}', '{itemname}', '{bill_quantity}',"
+            f" '{bill_price}', '{bill_discount}', '{bill_date}', '{bill_date_created}', '{bill_description}', '{user_id}') RETURNING user_id ")
+
+        # Get the last inserted id
+        """This return where the messagebox to let know to the user their  ID number alocated by the DB """
+        insertedIBilling_Code = cursor.fetchone()[0]
+
+        # Commit the changes to the database
+        conn.commit()
+        # possibilite to have the ID of the last inserted Billing
+
+        return insertedIBilling_Code
+        # Close the cursor and connection
+        # cursor.close()
+        # conn.close()
+
+    print("Supplier data been created successfully in inventory_transaction TABLE  ")
 
     def INcheckBill(self):
         pass
