@@ -18,10 +18,10 @@ from backend_user import User
 ID = ""
 LABELS = ("",12, '')
 class SecondWindow:
-    ##################################$$$$$$$$$$$$  ITEMS  $$$$$$$$$$$$$$$$#######################################
+    ##################################$$$$$$$$$$$$  Billing  $$$$$$$$$$$$$$$$#######################################
     """ When user click on Show button this will display the whole data from inventory_suppliers TABLE"""
 
-    def showItem(self):
+    def showBill(self):
         # 1- first clear the data in treeview (otherwise the data in treeview will be repeated)
         for item in self.item_tree.get_children():
             self.item_tree.delete(item)
@@ -34,50 +34,53 @@ class SecondWindow:
 
     """Insert new Supplier. button INSERT"""
 
-    def insertItem(self):
+    def insertBill(self):
         # logged user Name
         username_in_the_system = self.user_name
         # logged user ID
         username_in_the_systemID = int(self.user_id)
 
         # Entries data
-        itemCode = self.itemCodeEntry.get()
-        itemName = self.itemNameEntry.get()
-        itemDescription = self.itemDescriptionEntry.get()
-        itemSupId = self.itemSupplierIdEntry.get()
-        itemQty = self.itemQuantityEntry.get()
-        itemPrice = self.itemPriceEntry.get()
+        self.BillType
+        billCode = self.BillCodeEntry.get()
+        billCompanyName = self.BillCompanyNameEntry.get()
+        billItemId = self.BillItemIdEntry.get()
+        billItemName = self.BillItemNameEntry.get()
+        billQty = self.BillQtyEntry.get()
+        billPrice = self.BillPriceEntry.get()
+        billDiscount = self.BillDiscountEntry.get()
+        billDescription = self.BillDescriptionEntry.get()
+
         dateIn = datetime.today().strftime('%m/%d/%Y')
-        itemMinStock = self.itemMinStockEntry.get()
-        itemLocation = self.itemLocationEntry.get()
 
         # check if any entry case is empty
-        if (itemCode == '' or itemName == '' or itemDescription == '' or itemSupId == '' or itemQty == '' or
-                itemPrice == '' or itemMinStock == '' or itemLocation == ""):
+        if (billCode == '' or billCompanyName == '' or billItemId == '' or billItemName == '' or billQty == '' or
+            billPrice == '' or  billDiscount == ''  ):
+            #maybe to specify in the message with Entry case are mandatory
             messagebox.showerror("Error", "All the entry case must be filled!")
         # if all the data is correct
         else:
-            messagebox.askyesno('Confirm',
-                                f"{username_in_the_system} Do you want to add New Item \n\n\n Code: {itemCode}\n\n"
-                                f"Item name: {itemName} \n\n Item Description: {itemDescription} \n\n "
-                                f"Item Supplier ID: {itemSupId} \n\n Quantity: {itemQty} \n\n "
-                                f"Price: {itemPrice} \n\n Item Min.Stock{itemMinStock} \n\n "
-                                f"Item Location: {itemLocation}")
-            item_collection.in_newItem(
-                itemCode, itemName, itemDescription, itemSupId, int(itemQty), itemPrice, username_in_the_systemID,
-                dateIn, int(itemMinStock), itemLocation
-            )
+            confirmation = messagebox.askyesno('Confirm',
+                                f"{username_in_the_system} Do you want to create the Bill Reference: {billCode}\n\n"
+                                f"Item name: {billItemName} \n\n to/from: {billCompanyName} \n\n "
+                                f"Item: {billItemName} \n\n Quantity: { billQty} \n\n "
+                                f"Price: {billPrice} \n\n Discount:{billDiscount} \n\n "
+                                )
+            if confirmation:
+                billing_collection.in_newBill(username_in_the_systemID
+
+                )
             # this can be used to let know the user that the data of this id have been well inserted. With a messagebox
-            print(supplier_collection.in_newSupplier)
+            print(billing_collection.in_newBill)
             if supplier_collection.in_newSupplier:
-                self.itemCodeEntry.delete(0, END)
-                self.itemNameEntry.delete(0, END)
-                self.itemDescriptionEntry.delete(0, END)
-                self.itemSupplierIdEntry.delete(0, END)
-                self.itemQuantityEntry.delete(0, END)
-                self.itemPriceEntry.delete(0, END)
-                self.itemMinStockEntry.delete(0, END)
-                self.itemLocationEntry.delete(0, END)
+                self.BillCodeEntry.delete(0,END)
+                self.BillCompanyNameEntry.delete(0,END)
+                self.BillItemIdEntry.delete(0,END)
+                self.BillItemNameEntry.delete(0,END)
+                self.BillQtyEntry.delete(0,END)
+                self.BillPriceEntry.delete(0,END)
+                self.BillDiscountEntry.delete(0,END)
+                self.BillDescriptionEntry.delete(0,END)
 
     """Update Item description, Qty, price, updateBy, updateDate, minStock or/ and location . button UPDATE"""
 
@@ -594,55 +597,59 @@ class SecondWindow:
 
         ################################# BILLING TAB, RADIOBUTTON, LABELS AND ENTRIES
         ###############RADIOBUTTON#################################################
-        BILLING = tkinter.StringVar() #RADIOBUTTON VARIABLE
-        BILLING.set('Entrance') #THE
-        def radioBtn():
-            print (BILLING.get())
-        inStock = tkinter.Radiobutton(BillingTab, text="Entrance", variable=BILLING, value = 'Entrance', command=lambda : radioBtn())
-        inStock.pack( side=tkinter.TOP)#anchor='w'
-        outStock = tkinter.Radiobutton(BillingTab, text="Exit", variable=BILLING,value = 'Exit', command=lambda : radioBtn())
-        outStock.pack(side=tkinter.TOP)#side=tkinter.TOP,
+        self.BILLING = tkinter.StringVar() #RADIOBUTTON VARIABLE
+        self.BILLING.set('Entrance') #THE DEFAULT
+        #Function to catch the result from radiobutton and use it in insertBill()
+        def billType():
+            self.BillType = self.BILLING.get()
+            return self.BillType
+        self.inStock = tkinter.Radiobutton(BillingTab, text="Entrance", variable=self.BILLING, value = 'Entrance', command=lambda : billType())
+        self.inStock.pack( anchor='w', padx=15)#anchor='w'
+        self.outStock = tkinter.Radiobutton(BillingTab, text="Exit", variable=self.BILLING,value = 'Exit', command=lambda : billType())
+        self.outStock.pack(anchor='w', padx=15)#side=tkinter.TOP,
+        self.selected_value = None
+        # self.billType()
         ##############################################################################
         ################LABELS & ENTRIES############################################
         date = tkcalendar.DateEntry(BillingTab, width=10)
         date.pack()
         lb_ItemCode = ttk.Label(BillingTab, text="Reference Number:")
         lb_ItemCode.pack()
-        self.BillingCodeEntry = ttk.Entry(BillingTab)
-        self.BillingCodeEntry.pack()
-        lb_ItemName = ttk.Label(BillingTab, text="Company ID:")
-        lb_ItemName.pack()
-        self.BillingNameEntry = ttk.Entry(BillingTab)
-        self.BillingNameEntry.pack()
-        lb_ItemDescription = ttk.Label(BillingTab, text="Item ID:")
-        lb_ItemDescription.pack()
-        self.BillingDescriptionEntry = ttk.Entry(BillingTab)
-        self.BillingDescriptionEntry.pack()
-        lb_ItemDescription = ttk.Label(BillingTab, text="Item Name:")
-        lb_ItemDescription.pack()
-        self.BillingDescriptionEntry = ttk.Entry(BillingTab)
-        self.BillingDescriptionEntry.pack()
-        lb_ItemSupplierId = ttk.Label(BillingTab, text="Quantity:")
-        lb_ItemSupplierId.pack()
-        self.BillingSupplierIdEntry = ttk.Entry(BillingTab)
-        self.BillingSupplierIdEntry.pack()
-        lb_ItemQuantity = ttk.Label(BillingTab, text="Price:")
-        lb_ItemQuantity.pack()
-        self.BillingQuantityEntry = ttk.Entry(BillingTab)
-        self.BillingQuantityEntry.pack()
-        lb_ItemPrice = ttk.Label(BillingTab, text="Discount:")
-        lb_ItemPrice.pack()
-        self.BillingPriceEntry = ttk.Entry(BillingTab)
-        self.BillingPriceEntry.pack()
-        lb_ItemMinStock = ttk.Label(BillingTab, text="Description:")
-        lb_ItemMinStock.pack()
-        self.BillingMinStockEntry = tkinter.Text(BillingTab, width = 18, height = 1)
-        self.BillingMinStockEntry.pack()
+        self.BillCodeEntry = ttk.Entry(BillingTab)
+        self.BillCodeEntry.pack()
+        lb_CompanyId = ttk.Label(BillingTab, text="Company ID:")
+        lb_CompanyId.pack()
+        self.BillCompanyNameEntry = ttk.Entry(BillingTab)
+        self.BillCompanyNameEntry.pack()
+        lb_BillItemId = ttk.Label(BillingTab, text="Item ID:")
+        lb_BillItemId.pack()
+        self.BillItemIdEntry = ttk.Entry(BillingTab)
+        self.BillItemIdEntry.pack()
+        lb_BillItemName = ttk.Label(BillingTab, text="Item Name:")
+        lb_BillItemName.pack()
+        self.BillItemNameEntry = ttk.Entry(BillingTab)
+        self.BillItemNameEntry.pack()
+        lb_BillQty = ttk.Label(BillingTab, text="Quantity:")
+        lb_BillQty.pack()
+        self.BillQtyEntry = ttk.Entry(BillingTab)
+        self.BillQtyEntry.pack()
+        lb_BillPrice = ttk.Label(BillingTab, text="Price:")
+        lb_BillPrice.pack()
+        self.BillPriceEntry = ttk.Entry(BillingTab)
+        self.BillPriceEntry.pack()
+        lb_BillDiscount = ttk.Label(BillingTab, text="Discount:")
+        lb_BillDiscount.pack()
+        self.BillDiscountEntry = ttk.Entry(BillingTab)
+        self.BillDiscountEntry.pack()
+        lb_BillDescription = ttk.Label(BillingTab, text="Description:")
+        lb_BillDescription.pack()
+        self.BillDescriptionEntry = tkinter.Text(BillingTab, width = 18, height = 1)
+        self.BillDescriptionEntry.pack()
     #######################################################################
 
 
         ###BUTTONS
-        btn_InsertItem = ttk.Button(BillingTab, text="Insert", command = lambda : self.insertItem())
+        btn_InsertItem = ttk.Button(BillingTab, text="Insert", command = lambda : self.insertBill())
         btn_InsertItem.pack()
         btn_UpdateItem = ttk.Button(BillingTab, text="Update")
         btn_UpdateItem.pack(side=tkinter.RIGHT)

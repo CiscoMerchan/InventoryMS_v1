@@ -354,8 +354,20 @@ class ItemDB:
         conn.commit()
         return dataItems
 
-    def a_item(self):
-        pass
+    def a_item(self,itemID):
+        passconn.autocommit = True
+        # Creating a cursor object
+        cursor = conn.cursor()
+        # INSERT
+        cursor.execute(f"SELECT item_available FROM inventory_items WHERE code_id = '{itemID}'; ")
+
+        # Get the last inserted id
+        """This return all the data from inventory_items TABLE """
+        dataItems = cursor.fetchall()
+
+        # Commit the changes to the database
+        conn.commit()
+        return dataItems
 
     def updateItem(self, code_id, description = None, Qty = None, price = None, updateBy = None, updateDate = None,
                    minStock = None,location = None):
@@ -409,7 +421,42 @@ class ItemDB:
         cursor.execute(query, query_values)
         conn.commit()
         cursor.close()
-    ############################################################################################
+
+    """This function is to use in Billing TAB(def insertBill():). To update the item quantity after
+    operation (if entrace = +, if exit = -)"""
+    def updateItemQty(self,itemID, BillType, BillQty):
+        conn.autocommit = True
+        # Creating a cursor object
+        cursor = conn.cursor()
+        # INSERT
+        cursor.execute(f"SELECT item_available FROM inventory_items WHERE code_id = '{itemID}'; ")
+        result = cursor.fetchone()[0]
+        print(result)
+        conn.commit()
+        cursor.close()
+        if BillType =="Entrance":
+            newQty = result + BillQty
+        else:
+            if BillQty > result:
+                print('not enogth')
+                return "no good"
+            else:
+                newQty = result - BillQty
+        conn.autocommit = True
+        # Creating a cursor object
+        cursor = conn.cursor()
+        cursor.execute(f"UPDATE inventory_items SET item_available = '{newQty}' WHERE code_id = '{itemID}'; ")
+        conn.commit()
+        cursor.execute(f"SELECT item_available FROM inventory_items WHERE code_id = '{itemID}'; ")
+        newResult = cursor.fetchone()[0]
+        print(newResult)
+        return newResult
+
+bill = ItemDB()
+
+res = bill.updateItemQty('03',"Entance",130)
+print(res)
+############################################################################################
 
 
 ############################################################################################
@@ -417,7 +464,7 @@ class ItemDB:
 ##############################################################################################
 class BillingDB:
     ######### IN = Ingress in inventory#############
-    def IN_in_newBill(self,bill_id, entrance_or_exit, company_id, item_id, itemname, bill_quantity,
+    def in_newBill(self,bill_id, entrance_or_exit, company_id, item_id, itemname, bill_quantity,
                         bill_price, bill_discount, bill_date, bill_date_created, bill_description, user_id ):
         conn.autocommit = True
         # Creating a cursor object

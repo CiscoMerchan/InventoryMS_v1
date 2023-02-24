@@ -47,6 +47,26 @@ Challange:
 
 17/02/2023
 * Add Billing tab
+24/02/2023
+Mas complicado hoy por hacer billing tab. no es solamente copiar la plantilla sino tambien,
+Challange 1 : Radio button pasar el get a la function de inser, cree una funcion que retorna
+el resultado.
+2Challenge: tener que segun el resultado de defBillType, se suma o resta elen la columna Quantity del item que se
+esta ratando.
+3Challenge 3: resolver el update la suma o resta en quatity del item en cuestion
+Press Insert bill =>
+Qty = Itemid fetch quantity
+if bill = Entrance:
+    newQty = Qty + BillQTy
+    update column = ItemQty Where itemId
+else:
+    if BillQty > Qty:
+        Messagebox = No enogth item
+    else:
+        newQty = Qty - Bill
+        update column = ItemQty Where itemId
+        THEN CONTINUE THE CODE TO INSERT THE NEW BILLING
+
 
 TODO
     # Check billing tab radiobutton ()
