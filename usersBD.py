@@ -435,13 +435,13 @@ class ItemDB:
         conn.commit()
         cursor.close()
         if BillType =="Entrance":
-            newQty = result + BillQty
+            newQty = result + int(BillQty)
         else:
-            if BillQty > result:
+            if int(BillQty) > result:
                 print('not enogth')
-                return "no good"
+                return False
             else:
-                newQty = result - BillQty
+                newQty = result - int(BillQty)
         conn.autocommit = True
         # Creating a cursor object
         cursor = conn.cursor()
@@ -452,10 +452,10 @@ class ItemDB:
         print(newResult)
         return newResult
 
-bill = ItemDB()
-
-res = bill.updateItemQty('03',"Entance",130)
-print(res)
+# bill = ItemDB()
+#
+# res = bill.updateItemQty('03',"Entance",130)
+# print(res)
 ############################################################################################
 
 

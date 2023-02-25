@@ -32,55 +32,78 @@ class SecondWindow:
             # 3- INSERTION OF VALUES FROM DB TO TREEVIEEW
             self.item_tree.insert('', 'end', text=row[0], values=row[0:])
 
-    """Insert new Supplier. button INSERT"""
-
+    """Insert new Bill. button INSERT"""
     def insertBill(self):
         # logged user Name
         username_in_the_system = self.user_name
         # logged user ID
         username_in_the_systemID = int(self.user_id)
-
-        # Entries data
-        self.BillType
+        # print(self.get_billType())
+        ### Entries data
+        # This catch the choice in radiobutton
+        billType = self.BILLING.get()
+        print(billType)
+        # Bill reference number
         billCode = self.BillCodeEntry.get()
-        billCompanyName = self.BillCompanyNameEntry.get()
+        # Name of the company Client or Supplier
+        billCompanyId = self.BillCompanyIdEntry.get()
+        # Item ID
         billItemId = self.BillItemIdEntry.get()
+        # Item name
         billItemName = self.BillItemNameEntry.get()
+        # Qty of the item to in or out of the stock
         billQty = self.BillQtyEntry.get()
+        #Item price
         billPrice = self.BillPriceEntry.get()
+        #If didcount on the item price
         billDiscount = self.BillDiscountEntry.get()
-        billDescription = self.BillDescriptionEntry.get()
-
+        #description on the bill transaction
+        billDescription = self.BillDescriptionEntry.get("1.0", "end")
+        # date that the bill is inserted
         dateIn = datetime.today().strftime('%m/%d/%Y')
+        # date when the order was made
+        billDate = self.date.get_date()
 
         # check if any entry case is empty
-        if (billCode == '' or billCompanyName == '' or billItemId == '' or billItemName == '' or billQty == '' or
+        if (billCode == '' or billCompanyId == '' or billItemId == '' or billItemName == '' or billQty == '' or
             billPrice == '' or  billDiscount == ''  ):
             #maybe to specify in the message with Entry case are mandatory
             messagebox.showerror("Error", "All the entry case must be filled!")
         # if all the data is correct
         else:
-            confirmation = messagebox.askyesno('Confirm',
+            """update_result is avariable that takes parameters to update the item quantity and at the same time,
+            check if there is more than the bill quantity, in case there is not enough items it will return false 
+            and let know the user that the operation is not possible"""
+            update_result = item_collection.updateItemQty(itemID=billItemId,BillType=billType, BillQty=billQty)
+            #if the billQty is > that the item quantity
+            if update_result == False:
+                 messagebox.showerror('ERROR', f"Sorry the quantity of the bill: {billCode} is superior to "
+                                                  f"the quantity in the store!")
+
+            else:
+                print(str(update_result)+ " Item quantity updated successfully")
+                confirmation = messagebox.askyesno('Confirm',
                                 f"{username_in_the_system} Do you want to create the Bill Reference: {billCode}\n\n"
-                                f"Item name: {billItemName} \n\n to/from: {billCompanyName} \n\n "
+                                f"Item name: {billItemName} \n\n to/from Company ID: {billCompanyId} \n\n "
                                 f"Item: {billItemName} \n\n Quantity: { billQty} \n\n "
                                 f"Price: {billPrice} \n\n Discount:{billDiscount} \n\n "
                                 )
-            if confirmation:
-                billing_collection.in_newBill(username_in_the_systemID
-
-                )
+                if confirmation:
+                    billing_collection.in_newBill(billCode,billType,billCompanyId,billItemId, billItemName, int(billQty),
+                                                  billPrice, billDiscount, dateIn, billDate, billDescription,
+                                                  username_in_the_systemID )
+                    messagebox.showinfo("Bill Done", f"Bill number: '{billCode}' Save!")
             # this can be used to let know the user that the data of this id have been well inserted. With a messagebox
-            print(billing_collection.in_newBill)
-            if supplier_collection.in_newSupplier:
-                self.BillCodeEntry.delete(0,END)
-                self.BillCompanyNameEntry.delete(0,END)
-                self.BillItemIdEntry.delete(0,END)
-                self.BillItemNameEntry.delete(0,END)
-                self.BillQtyEntry.delete(0,END)
-                self.BillPriceEntry.delete(0,END)
-                self.BillDiscountEntry.delete(0,END)
-                self.BillDescriptionEntry.delete(0,END)
+                    print(billing_collection.in_newBill)
+                    if billing_collection.in_newBill:
+                        self.BillCodeEntry.delete(0,END)
+                        self.BillCompanyIdEntry.delete(0,END)
+                        self.BillItemIdEntry.delete(0,END)
+                        self.BillItemNameEntry.delete(0,END)
+                        self.BillQtyEntry.delete(0,END)
+                        self.BillPriceEntry.delete(0,END)
+                        self.BillDiscountEntry.delete(0,END)
+                        self.BillDescriptionEntry.delete('1.0','end')
 
     """Update Item description, Qty, price, updateBy, updateDate, minStock or/ and location . button UPDATE"""
 
@@ -600,27 +623,28 @@ class SecondWindow:
         self.BILLING = tkinter.StringVar() #RADIOBUTTON VARIABLE
         self.BILLING.set('Entrance') #THE DEFAULT
         #Function to catch the result from radiobutton and use it in insertBill()
-        def billType():
-            self.BillType = self.BILLING.get()
-            return self.BillType
-        self.inStock = tkinter.Radiobutton(BillingTab, text="Entrance", variable=self.BILLING, value = 'Entrance', command=lambda : billType())
+    # def billType(self):
+    #     self.BillType = self.BILLING.get()
+    #     return self.BillType
+        self.inStock = tkinter.Radiobutton(BillingTab, text="Entrance", variable=self.BILLING, value = 'Entrance', command=lambda : self.insertBill())
         self.inStock.pack( anchor='w', padx=15)#anchor='w'
-        self.outStock = tkinter.Radiobutton(BillingTab, text="Exit", variable=self.BILLING,value = 'Exit', command=lambda : billType())
+        self.outStock = tkinter.Radiobutton(BillingTab, text="Exit", variable=self.BILLING,value = 'Exit', command=lambda : self.insertBill())
         self.outStock.pack(anchor='w', padx=15)#side=tkinter.TOP,
         self.selected_value = None
-        # self.billType()
+    # def get_billType(self):
+    #     return self.BillType
         ##############################################################################
         ################LABELS & ENTRIES############################################
-        date = tkcalendar.DateEntry(BillingTab, width=10)
-        date.pack()
+        self.date = tkcalendar.DateEntry(BillingTab, width=10)
+        self.date.pack()
         lb_ItemCode = ttk.Label(BillingTab, text="Reference Number:")
         lb_ItemCode.pack()
         self.BillCodeEntry = ttk.Entry(BillingTab)
         self.BillCodeEntry.pack()
         lb_CompanyId = ttk.Label(BillingTab, text="Company ID:")
         lb_CompanyId.pack()
-        self.BillCompanyNameEntry = ttk.Entry(BillingTab)
-        self.BillCompanyNameEntry.pack()
+        self.BillCompanyIdEntry = ttk.Entry(BillingTab)
+        self.BillCompanyIdEntry.pack()
         lb_BillItemId = ttk.Label(BillingTab, text="Item ID:")
         lb_BillItemId.pack()
         self.BillItemIdEntry = ttk.Entry(BillingTab)
