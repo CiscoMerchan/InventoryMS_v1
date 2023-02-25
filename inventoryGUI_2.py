@@ -19,18 +19,20 @@ ID = ""
 LABELS = ("",12, '')
 class SecondWindow:
     ##################################$$$$$$$$$$$$  Billing  $$$$$$$$$$$$$$$$#######################################
-    """ When user click on Show button this will display the whole data from inventory_suppliers TABLE"""
 
+
+    """ When user click on Show button this will display the whole data from inventory_suppliers TABLE"""
+    #fuction call  by Show Button
     def showBill(self):
         # 1- first clear the data in treeview (otherwise the data in treeview will be repeated)
-        for item in self.item_tree.get_children():
-            self.item_tree.delete(item)
+        for bill in self.billing_tree.get_children():
+            self.billing_tree.delete(bill)
         # 2- fetch data from DB
-        allitems = item_collection.allItems()
+        allbills = billing_collection.allBill()
 
-        for row in allitems:
+        for row in allbills:
             # 3- INSERTION OF VALUES FROM DB TO TREEVIEEW
-            self.item_tree.insert('', 'end', text=row[0], values=row[0:])
+            self.billing_tree.insert('', 'end', text=row[0], values=row[0:])
 
     """Insert new Bill. button INSERT"""
     def insertBill(self):
@@ -108,60 +110,61 @@ class SecondWindow:
     """Update Item description, Qty, price, updateBy, updateDate, minStock or/ and location . button UPDATE"""
 
     def update_Item(self):
-        # logged user Name
-        username_in_the_system = self.user_name
-        # logged user ID
-        username_in_the_systemID = int(self.user_id)
-
-        # Entries data
-        itemCode = self.itemCodeEntry.get()
-        itemDescription = self.itemDescriptionEntry.get()
-        itemQty = self.itemQuantityEntry.get()
-        itemPrice = self.itemPriceEntry.get()
-        dateUpdate = datetime.today().strftime('%m/%d/%Y')
-        itemMinStock = self.itemMinStockEntry.get()
-        itemLocation = self.itemLocationEntry.get()
-        #  Item code ID is mandatory
-        if (
-                itemCode == "" or itemDescription == "" or itemQty == "" or itemPrice == "" or
-                itemMinStock == "" or itemLocation == ""):
-            print(itemCode, itemDescription, itemQty, itemPrice, dateUpdate, itemMinStock, itemLocation)
-            messagebox.showerror("ERROR",
-                                 "No empty case in: Item code, Description , Quantity, Price, Min.Stock or Location  entries")
-        else:
-            # Confirme the change to update
-            confirmeUpdate = messagebox.askokcancel("Confirmation",
-                                                    f" {username_in_the_system}: You are Updating Item {itemCode} the :"
-                                                    f"\n\nDescription: {itemDescription}, \n\n Quantity: {itemQty} \n\n"
-                                                    f"Price: {itemPrice}\n\n Min. Stock: {itemMinStock} \n\n "
-                                                    f"Location: {itemLocation}")
-            if confirmeUpdate:
-                item_collection.updateItem(itemCode, itemDescription, itemQty, itemPrice, username_in_the_systemID,
-                                           dateUpdate, itemMinStock, itemLocation)
-                # data have been updated
-                messagebox.showinfo('Info', 'Update save ')
-                # After the data have been updated clear the Entry widgets
-                self.itemCodeEntry.delete(0, END)
-                self.itemNameEntry.delete(0, END)
-                self.itemDescriptionEntry.delete(0, END)
-                self.itemSupplierIdEntry.delete(0, END)
-                self.itemQuantityEntry.delete(0, END)
-                self.itemPriceEntry.delete(0, END)
-                self.itemMinStockEntry.delete(0, END)
-                self.itemLocationEntry.delete(0, END)
-            else:
-                messagebox.showwarning("Info", f"No change have been made for Item code id: {itemCode}")
+        pass
+    #     # logged user Name
+    #     username_in_the_system = self.user_name
+    #     # logged user ID
+    #     username_in_the_systemID = int(self.user_id)
+    #
+    #     # Entries data
+    #     itemCode = self.itemCodeEntry.get()
+    #     itemDescription = self.itemDescriptionEntry.get()
+    #     itemQty = self.itemQuantityEntry.get()
+    #     itemPrice = self.itemPriceEntry.get()
+    #     dateUpdate = datetime.today().strftime('%m/%d/%Y')
+    #     itemMinStock = self.itemMinStockEntry.get()
+    #     itemLocation = self.itemLocationEntry.get()
+    #     #  Item code ID is mandatory
+    #     if (
+    #             itemCode == "" or itemDescription == "" or itemQty == "" or itemPrice == "" or
+    #             itemMinStock == "" or itemLocation == ""):
+    #         print(itemCode, itemDescription, itemQty, itemPrice, dateUpdate, itemMinStock, itemLocation)
+    #         messagebox.showerror("ERROR",
+    #                              "No empty case in: Item code, Description , Quantity, Price, Min.Stock or Location  entries")
+    #     else:
+    #         # Confirme the change to update
+    #         confirmeUpdate = messagebox.askokcancel("Confirmation",
+    #                                                 f" {username_in_the_system}: You are Updating Item {itemCode} the :"
+    #                                                 f"\n\nDescription: {itemDescription}, \n\n Quantity: {itemQty} \n\n"
+    #                                                 f"Price: {itemPrice}\n\n Min. Stock: {itemMinStock} \n\n "
+    #                                                 f"Location: {itemLocation}")
+    #         if confirmeUpdate:
+    #             item_collection.updateItem(itemCode, itemDescription, itemQty, itemPrice, username_in_the_systemID,
+    #                                        dateUpdate, itemMinStock, itemLocation)
+    #             # data have been updated
+    #             messagebox.showinfo('Info', 'Update save ')
+    #             # After the data have been updated clear the Entry widgets
+    #             self.itemCodeEntry.delete(0, END)
+    #             self.itemNameEntry.delete(0, END)
+    #             self.itemDescriptionEntry.delete(0, END)
+    #             self.itemSupplierIdEntry.delete(0, END)
+    #             self.itemQuantityEntry.delete(0, END)
+    #             self.itemPriceEntry.delete(0, END)
+    #             self.itemMinStockEntry.delete(0, END)
+    #             self.itemLocationEntry.delete(0, END)
+    #         else:
+    #             messagebox.showwarning("Info", f"No change have been made for Item code id: {itemCode}")
 
     # Funtion to clear the Entry boxes
-    def clearItem(self):
-        self.itemCodeEntry.delete(0, END)
-        self.itemNameEntry.delete(0, END)
-        self.itemDescriptionEntry.delete(0, END)
-        self.itemSupplierIdEntry.delete(0, END)
-        self.itemQuantityEntry.delete(0, END)
-        self.itemPriceEntry.delete(0, END)
-        self.itemMinStockEntry.delete(0, END)
-        self.itemLocationEntry.delete(0, END)
+    def clearBill(self):
+        self.BillCodeEntry.delete(0, END)
+        self.BillCompanyIdEntry.delete(0, END)
+        self.BillItemIdEntry.delete(0, END)
+        self.BillItemNameEntry.delete(0, END)
+        self.BillQtyEntry.delete(0, END)
+        self.BillPriceEntry.delete(0, END)
+        self.BillDiscountEntry.delete(0, END)
+        self.BillDescriptionEntry.delete('1.0', 'end')
 
     ########################################################################################################
 
@@ -589,7 +592,10 @@ class SecondWindow:
 
         for row in allbills:
             # INSERTION OF VALUES FROM DB TO TREEVIEEW
-            self.billing_tree.insert('', 'end', text=row[0], values=row[0:])
+            """To change the bg on the treeview"""
+            # self.billing_tree.tag_configure('oddrow', background='gray')
+            self.billing_tree.insert('', 'end', text=row[0], values=row[0:] , tags = ('oddrow',))
+            # self.billing_tree.tag_configure('oddrow', background='gray')
         # Scrollbar for the treeview
         billing_tree_scroll = ttk.Scrollbar(BillingTreeview, orient="vertical", command=self.billing_tree.yview)
         billing_tree_scroll.pack(side=tkinter.LEFT, fill=tkinter.Y)
@@ -621,6 +627,48 @@ class SecondWindow:
         self.billing_tree.column(10, width=250, anchor='center')
         self.billing_tree.column(11, width=50, anchor='center')
 
+        ###############################################################
+        ####Select items from the treeview###
+        ###############################################################
+        """this methods is to select,fetch and return data from the clicked row in the treeview """
+
+        def treeview_select(event):
+            # FETCH SELECTED ROW
+            select_BillId = event.widget.selection()[0]  # FETCH ALL VALUES OF THE ROW
+            print(select_BillId)
+            select_BillIdValue = event.widget.item(select_BillId)['values']
+            print(select_BillIdValue)
+            """Configuration of the labes at the topframe. When the user clicks one of the row in the treeview the data 
+            from the clicked row will be display at the top. thE VALUE ARE INDEXED"""
+
+            """Rendering the selected row in the treeview into the Entry widgets"""
+            # Bill CODE
+            self.BillCodeEntry.delete(0, END)
+            self.BillCodeEntry.insert(0, select_BillIdValue[0])
+            # Bill company id
+            self.BillCompanyIdEntry.delete(0, END)
+            self.BillCompanyIdEntry.insert(0, select_BillIdValue[2])
+            # Bill item id
+            self.BillItemIdEntry.delete(0, END)
+            self.BillItemIdEntry.insert(0, select_BillIdValue[3])
+            # Bill item name
+            self.BillItemNameEntry.delete(0, END)
+            self.BillItemNameEntry.insert(0, select_BillIdValue[4])
+            # Bill QUANTITY
+            self.BillQtyEntry.delete(0, END)
+            self.BillQtyEntry.insert(0, select_BillIdValue[5])
+            # Bill PRICE
+            self.BillPriceEntry.delete(0, END)
+            self.BillPriceEntry.insert(0, select_BillIdValue[6])
+            # Bill Discount
+            self.BillDiscountEntry.delete(0, END)
+            self.BillDiscountEntry.insert(0, select_BillIdValue[7])
+            # ITEM LOCATION
+            self.BillDescriptionEntry.delete('1.0', 'end')
+            self.BillDescriptionEntry.insert('1.0', select_BillIdValue[9])
+        self.billing_tree.bind('<<TreeviewSelect>>', treeview_select)
+            ############################################
+
         ################################# BILLING TAB, RADIOBUTTON, LABELS AND ENTRIES
         ###############RADIOBUTTON#################################################
         self.BILLING = tkinter.StringVar() #RADIOBUTTON VARIABLE
@@ -636,8 +684,8 @@ class SecondWindow:
         ################LABELS & ENTRIES############################################
         self.date = tkcalendar.DateEntry(BillingTab, width=10)
         self.date.pack()
-        lb_ItemCode = ttk.Label(BillingTab, text="Reference Number:")
-        lb_ItemCode.pack()
+        lb_BillCode = ttk.Label(BillingTab, text="Reference Number:")
+        lb_BillCode.pack()
         self.BillCodeEntry = ttk.Entry(BillingTab)
         self.BillCodeEntry.pack()
         lb_CompanyId = ttk.Label(BillingTab, text="Company ID:")
@@ -672,16 +720,28 @@ class SecondWindow:
 
 
         ###BUTTONS
+        #INSERT BUTTON
         btn_InsertBill = ttk.Button(BillingTab, text="Insert", command = lambda : self.insertBill())
-        btn_InsertBill.pack()
+        btn_InsertBill.pack(side=tkinter.TOP)
+        btn_InsertBill.bind("<Return>", lambda event: self.insertBill()(btn_InsertBill["Insert"]))
+        #UPDATE BUTTON
         btn_UpdateBill = ttk.Button(BillingTab, text="Update")
-        btn_UpdateBill.pack(side=tkinter.RIGHT)
-        btn_BillShow = ttk.Button(BillingTab, text="Show")
-        btn_BillShow.pack()
+        btn_UpdateBill.pack(side=tkinter.TOP)
+        btn_UpdateBill.bind("<Return>", lambda event: self.updateBill()(btn_InsertBill["Update"]))
+        # SHOW BUTTON
+        btn_BillShow = ttk.Button(BillingTab, text="Show",command = lambda : self.insertBill())
+        btn_BillShow.pack(side=tkinter.LEFT)
+        btn_BillShow.bind("<Return>", lambda event: self.showBill()(btn_BillShow["Show"]))
+        # Clear button
+        btn_BillClear = ttk.Button(BillingTab, text="Clear", command=lambda: self.clearItem())
+        btn_BillClear.pack(side=tkinter.BOTTOM)
+        btn_BillClear.bind("<Return>", lambda event: self.clearBill()(btn_BillClear["Clear"]))
         ####
         self.notebook.add(BillingFrame, text="Billing")
                   ## END BILLING ###
 ###################################################################
+
+
         """ITEMS"""
         #### MAIN FRAME ######################################################################
         itemFrame = ttk.Frame(self.notebook)
