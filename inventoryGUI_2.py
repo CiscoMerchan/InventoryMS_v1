@@ -580,59 +580,58 @@ class SecondWindow:
         # item_tree.insert('','end', text=itemlist[0], values=itemlist[0:])
         ######################## ITEM TREEVIEW
 
-        Billing_tree = ttk.Treeview(BillingTreeview, height=18, columns=(
+        self.billing_tree = ttk.Treeview(BillingTreeview, height=18, columns=(
             "Reference ID", "Entrance/Exit", "Company ID", "Item ID", "Item Name", "Quantity", "Price",
             "Discount","Date","Created Date", "Description", "UserID"), show="headings")
-        Billing_tree.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
-        # item_tree.insert('', 'end', text=itemlist[0], values=lis[0:])   # Insert data into the treeview
-        for row in lis:
-            Billing_tree.insert('', 'end', values=row)  # test Insert data into the treeview
+        self.billing_tree.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
+        # fetch data from DB
+        allbills = billing_collection.allBill()
+
+        for row in allbills:
+            # INSERTION OF VALUES FROM DB TO TREEVIEEW
+            self.billing_tree.insert('', 'end', text=row[0], values=row[0:])
         # Scrollbar for the treeview
-        Billing_tree_scroll = ttk.Scrollbar(BillingTreeview, orient="vertical", command=Billing_tree.yview)
-        Billing_tree_scroll.pack(side=tkinter.LEFT, fill=tkinter.Y)
-        Billing_tree.configure(yscrollcommand=Billing_tree_scroll.set)
+        billing_tree_scroll = ttk.Scrollbar(BillingTreeview, orient="vertical", command=self.billing_tree.yview)
+        billing_tree_scroll.pack(side=tkinter.LEFT, fill=tkinter.Y)
+        self.billing_tree.configure(yscrollcommand=billing_tree_scroll.set)
         ##### Heading of the treeview
-        Billing_tree.heading(0, text="Reference ID", anchor='center')
-        Billing_tree.heading(1, text="Entrance/Exit", anchor='center')
-        Billing_tree.heading(2, text="Company ID", anchor='center')
-        Billing_tree.heading(3, text="Item ID", anchor='center')
-        Billing_tree.heading(4, text="Item Name", anchor='center')
-        Billing_tree.heading(5, text="Quantity", anchor='center')
-        Billing_tree.heading(6, text="Price", anchor='center')
-        Billing_tree.heading(7, text="Discount", anchor='center')
-        Billing_tree.heading(8, text="Date", anchor='center')
-        Billing_tree.heading(9, text="Created Date", anchor='center')
-        Billing_tree.heading(10, text="Description", anchor='center')
-        Billing_tree.heading(11, text="User ID", anchor='center')
+        self.billing_tree.heading(0, text="Reference ID", anchor='center')
+        self.billing_tree.heading(1, text="Entrance/Exit", anchor='center')
+        self.billing_tree.heading(2, text="Company ID", anchor='center')
+        self.billing_tree.heading(3, text="Item ID", anchor='center')
+        self.billing_tree.heading(4, text="Item Name", anchor='center')
+        self.billing_tree.heading(5, text="Quantity", anchor='center')
+        self.billing_tree.heading(6, text="Price", anchor='center')
+        self.billing_tree.heading(7, text="Discount", anchor='center')
+        self.billing_tree.heading(8, text="Date", anchor='center')
+        self.billing_tree.heading(9, text="Created Date", anchor='center')
+        self.billing_tree.heading(10, text="Description", anchor='center')
+        self.billing_tree.heading(11, text="User ID", anchor='center')
         ##### Columns of the treeview
-        Billing_tree.column(0, width=80, anchor='center')
-        Billing_tree.column(1, width=80, anchor='center')
-        Billing_tree.column(2, width=80, anchor='center')
-        Billing_tree.column(3, width=80, anchor='center')
-        Billing_tree.column(4, width=80, anchor='center')
-        Billing_tree.column(5, width=80, anchor='center')
-        Billing_tree.column(6, width=60, anchor='center')
-        Billing_tree.column(7, width=60, anchor='center')
-        Billing_tree.column(8, width=70, anchor='center')
-        Billing_tree.column(9, width=80, anchor='center')
-        Billing_tree.column(10, width=250, anchor='center')
-        Billing_tree.column(11, width=50, anchor='center')
+        self.billing_tree.column(0, width=80, anchor='center')
+        self.billing_tree.column(1, width=80, anchor='center')
+        self.billing_tree.column(2, width=80, anchor='center')
+        self.billing_tree.column(3, width=80, anchor='center')
+        self.billing_tree.column(4, width=80, anchor='center')
+        self.billing_tree.column(5, width=80, anchor='center')
+        self.billing_tree.column(6, width=60, anchor='center')
+        self.billing_tree.column(7, width=60, anchor='center')
+        self.billing_tree.column(8, width=70, anchor='center')
+        self.billing_tree.column(9, width=80, anchor='center')
+        self.billing_tree.column(10, width=250, anchor='center')
+        self.billing_tree.column(11, width=50, anchor='center')
 
         ################################# BILLING TAB, RADIOBUTTON, LABELS AND ENTRIES
         ###############RADIOBUTTON#################################################
         self.BILLING = tkinter.StringVar() #RADIOBUTTON VARIABLE
         self.BILLING.set('Entrance') #THE DEFAULT
-        #Function to catch the result from radiobutton and use it in insertBill()
-    # def billType(self):
-    #     self.BillType = self.BILLING.get()
-    #     return self.BillType
+
         self.inStock = tkinter.Radiobutton(BillingTab, text="Entrance", variable=self.BILLING, value = 'Entrance', command=lambda : self.insertBill())
         self.inStock.pack( anchor='w', padx=15)#anchor='w'
         self.outStock = tkinter.Radiobutton(BillingTab, text="Exit", variable=self.BILLING,value = 'Exit', command=lambda : self.insertBill())
         self.outStock.pack(anchor='w', padx=15)#side=tkinter.TOP,
         self.selected_value = None
-    # def get_billType(self):
-    #     return self.BillType
+
         ##############################################################################
         ################LABELS & ENTRIES############################################
         self.date = tkcalendar.DateEntry(BillingTab, width=10)
@@ -673,12 +672,12 @@ class SecondWindow:
 
 
         ###BUTTONS
-        btn_InsertItem = ttk.Button(BillingTab, text="Insert", command = lambda : self.insertBill())
-        btn_InsertItem.pack()
-        btn_UpdateItem = ttk.Button(BillingTab, text="Update")
-        btn_UpdateItem.pack(side=tkinter.RIGHT)
-        btn_ItemShow = ttk.Button(BillingTab, text="Show")
-        btn_ItemShow.pack()
+        btn_InsertBill = ttk.Button(BillingTab, text="Insert", command = lambda : self.insertBill())
+        btn_InsertBill.pack()
+        btn_UpdateBill = ttk.Button(BillingTab, text="Update")
+        btn_UpdateBill.pack(side=tkinter.RIGHT)
+        btn_BillShow = ttk.Button(BillingTab, text="Show")
+        btn_BillShow.pack()
         ####
         self.notebook.add(BillingFrame, text="Billing")
                   ## END BILLING ###

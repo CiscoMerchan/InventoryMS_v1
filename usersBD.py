@@ -491,32 +491,21 @@ class BillingDB:
 
     print("Supplier data been created successfully in inventory_transaction TABLE  ")
 
-    def INcheckBill(self):
-        pass
+    #This function returns all the data from inventory_transaction TABLE
+    def allBill(self):
+        conn.autocommit = True
+        # Creating a cursor object
+        cursor = conn.cursor()
+        # INSERT
+        cursor.execute("SELECT * FROM inventory_transaction ORDER BY bill_id ASC; ")
 
-    def INallBill(self):
-        pass
+        # Get the last inserted id
+        """This return all the data from inventory_transaction TABLE """
+        dataItems = cursor.fetchall()
 
-    def IN_a_Bill(self):
-        pass
-
-    def INupdateBill(self):
-        pass
-############## OUT = Discharge from inventory #########
-    def OUT_in_newBill(self):
-        pass
-
-    def OUTcheckBill(self):
-        pass
-
-    def OUTallBill(self):
-        pass
-
-    def OUT_a_Bill(self):
-        pass
-
-    def OUTupdateBill(self):
-        pass
+        # Commit the changes to the database
+        conn.commit()
+        return dataBills
 
 ############################################################################################
 
