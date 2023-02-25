@@ -501,7 +501,7 @@ class BillingDB:
 
         # Get the last inserted id
         """This return all the data from inventory_transaction TABLE """
-        dataItems = cursor.fetchall()
+        dataBills = cursor.fetchall()
 
         # Commit the changes to the database
         conn.commit()
