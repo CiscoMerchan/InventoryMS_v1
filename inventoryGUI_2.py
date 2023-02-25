@@ -1106,6 +1106,7 @@ class SecondWindow:
         lb_SupplierName.pack()
         self.supplierNameEntry = ttk.Entry(supplierTab)
         self.supplierNameEntry.pack()
+        lb_Supplier_Details = ttk.Label(supplierTab, text='Contact Details').pack(anchor='w', pady=10, padx=5)
         lb_SupplierAgent = ttk.Label(supplierTab, text="Agent Full Name:")
         lb_SupplierAgent.pack()
         self.supplierAgentEntry = ttk.Entry(supplierTab)
@@ -1261,6 +1262,8 @@ class SecondWindow:
         lb_ClientName.pack()
         self.clientNameEntry = ttk.Entry(clientTab)
         self.clientNameEntry.pack()
+        lb_Client_Details = ttk.Label(clientTab, text= 'Contact Details').pack(anchor='w',pady=10, padx=5)
+
         lb_ClientAgent = ttk.Label(clientTab, text="Agent Full Name:")
         lb_ClientAgent.pack()
         self.clientAgentEntry = ttk.Entry(clientTab)
