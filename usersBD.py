@@ -224,10 +224,26 @@ class SupplierDB:
         cursor.execute(query, query_values)
         conn.commit()
         cursor.close()
+
+
+    """Spinbox Supplier Name and ID """
+    #this function fetch and return all the id and name of the company supplier in inventory_suppliers TABLE
+    def Supplier_Name_Id(self):
+        conn.autocommit = True
+        # Creating a cursor object
+        cursor = conn.cursor()
+        # INSERT
+        cursor.execute("SELECT id, supplier_company_name FROM inventory_suppliers;")
+        results = cursor.fetchall()
+        return results
+        conn.commit()
+        cursor.close()
+
 ############################################################################################
 
 ##############################################################################################
 class ClientDB:
+    """Insert new Client"""
     def in_newClient(self, id, companyName, companyAgent, agentPhone, agentEmail):
         conn.autocommit = True
         # Creating a cursor object
@@ -271,7 +287,7 @@ class ClientDB:
 
     def a_Client(self):
         pass
-
+    """Update select client in the data base"""
     def updateClient(self, id, Agent = None, Phone = None, Email = None):
         # SQL query with placeholders for the columns to update
         query = "UPDATE inventory_clients SET client_company_agent = %s, client_agent_phone = %s, client_agent_email = %s WHERE id = %s;"
@@ -303,6 +319,20 @@ class ClientDB:
         if None in query_values:
             query_values = tuple(v if v is not None else existing_values[i] for i, v in enumerate(query_values))
         cursor.execute(query, query_values)
+        conn.commit()
+        cursor.close()
+    #################################################################
+
+    """Spinbox Client Name and ID """
+    #this function fetch and return all the id and name of the company client in inventory_clients TABLE
+    def Client_Name_Id(self):
+        conn.autocommit = True
+        # Creating a cursor object
+        cursor = conn.cursor()
+        # INSERT
+        cursor.execute("SELECT id, client_company_name FROM inventory_clients;")
+        results = cursor.fetchall()
+        return results
         conn.commit()
         cursor.close()
 ############################################################################################
@@ -456,6 +486,18 @@ class ItemDB:
 #
 # res = bill.updateItemQty('03',"Entance",130)
 # print(res)
+
+    """For Spinbox Item Name and ID TopFRame """
+    def Item_Name_Id(self):
+        conn.autocommit = True
+        # Creating a cursor object
+        cursor = conn.cursor()
+        # INSERT
+        cursor.execute("SELECT code_id, item_name FROM inventory_items;")
+        results = cursor.fetchall()
+        return results
+        conn.commit()
+        cursor.close()
 ############################################################################################
 
 
@@ -464,6 +506,7 @@ class ItemDB:
 ##############################################################################################
 class BillingDB:
     ######### IN = Ingress in inventory#############
+    """Insert new bill in inventory_transction TABLE"""
     def in_newBill(self,bill_id, entrance_or_exit, company_id, item_id, itemname, bill_quantity,
                         bill_price, bill_discount, bill_date, bill_date_created, bill_description, user_id ):
         conn.autocommit = True
@@ -491,7 +534,7 @@ class BillingDB:
 
     print("Supplier data been created successfully in inventory_transaction TABLE  ")
 
-    #This function returns all the data from inventory_transaction TABLE
+    """ #This function returns all the data from inventory_transaction TABLE"""
     def allBill(self):
         conn.autocommit = True
         # Creating a cursor object
@@ -506,6 +549,31 @@ class BillingDB:
         # Commit the changes to the database
         conn.commit()
         return dataBills
+
+    """#function to check if a Bill reference number already exist:"""
+    def checkId(self, id):
+        conn.autocommit = True
+        # Creating a cursor object
+        cursor = conn.cursor()
+        # INSERT
+        cursor.execute("SELECT bill_id  FROM inventory_transaction; ")
+        allIds = cursor.fetchall()
+        print(allIds)
+        for ids in allIds:
+            print(ids)
+            print('in loop')
+            if ids[0] == str(id):
+                print('if in loop')
+                return False
+            # else:
+            #     print('else in loop')
+        return id
+# check= BillingDB()
+#
+# r = check.checkId('0101')
+# print(r)
+
+
 
 ############################################################################################
 
