@@ -226,7 +226,7 @@ class SupplierDB:
         cursor.close()
 
 
-    """Spinbox Supplier Name and ID """
+    """Listbox Supplier Name and ID """
     #this function fetch and return all the id and name of the company supplier in inventory_suppliers TABLE
     def Supplier_Name_Id(self):
         conn.autocommit = True
@@ -323,7 +323,7 @@ class ClientDB:
         cursor.close()
     #################################################################
 
-    """Spinbox Client Name and ID """
+    """Listbox Client Name and ID """
     #this function fetch and return all the id and name of the company client in inventory_clients TABLE
     def Client_Name_Id(self):
         conn.autocommit = True
@@ -364,7 +364,7 @@ class ItemDB:
     # Close the cursor and connection
     # cursor.close()
     # conn.close()
-    print("Supplier data been created successfully in inventory_items TABLE  ")
+
 
     def checkItem(self):
         pass
@@ -487,7 +487,9 @@ class ItemDB:
 # res = bill.updateItemQty('03',"Entance",130)
 # print(res)
 
-    """For Spinbox Item Name and ID TopFRame """
+    """For Listbox Item Name and ID TopFRame """
+    #this function fetch and return all the id and name of the item in inventory_item TABLE
+
     def Item_Name_Id(self):
         conn.autocommit = True
         # Creating a cursor object

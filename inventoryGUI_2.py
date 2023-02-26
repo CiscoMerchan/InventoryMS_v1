@@ -1,7 +1,7 @@
 # Here will be the frame to operate the inventory
 import tkinter
 from sys import path
-from tkinter import ttk, messagebox, END, Text, Radiobutton
+from tkinter import ttk, messagebox, END, Text, Radiobutton, Listbox,StringVar, IntVar
 import tkcalendar as tkcalendar
 from datetime import datetime
 from accesory import CreateToolTip
@@ -36,6 +36,7 @@ class SecondWindow:
 
     """Insert new Bill. button INSERT"""
     def insertBill(self):
+
         # logged user Name
         username_in_the_system = self.user_name
         # logged user ID
@@ -66,6 +67,10 @@ class SecondWindow:
         # date when the order was made
         billDate = self.date.get_date()
 
+        # """FIRST CHECK. this function check if the billCode already exist in the DB   """
+        # checkBillCode = billing_collection.checkId(billCode)
+        # if checkBillCode == False:
+        #     messagebox.showerror('ERROR',"The Reference Number for")
         # check if any entry case is empty
         if (billCode == '' or billCompanyId == '' or billItemId == '' or billItemName == '' or billQty == '' or
             billPrice == '' or  billDiscount == ''  ):
@@ -165,6 +170,49 @@ class SecondWindow:
         self.BillPriceEntry.delete(0, END)
         self.BillDiscountEntry.delete(0, END)
         self.BillDescriptionEntry.delete('1.0', 'end')
+
+    #######################Listbox ###############################################################################
+    """In this area will have 3 function to render at the topFrame a listbox with name and id for: 
+        - Items
+        - Suppliers
+        - Clients
+    THis will help the user to find in one placethe necessary item id and the company name (Supplier or Client) to
+    used as input in the billing form. """
+
+    """Item"""
+    # this function will render in the BillingTopTab item name and id
+    def update_itemListabox(self, event):
+        if self.itemlistbox.curselection():
+            self.selected_item = self.itemlistbox.get(self.itemlistbox.curselection())
+            item_id = [item[1] for item in self.items if item[0] == self.selected_item][0]
+            self.entry_item_id.delete(0, tkinter.END)
+            self.entry_item_id.insert(0, item_id)
+        else:
+            self.selected_item = None
+    """Supplier"""
+
+    # this function will render in the BillingTopTab Supplier name and id
+    def update_SupplierListabox(self, event):
+        if self.suplistbox.curselection():
+            self.selected_sup = self.suplistbox.get(self.suplistbox.curselection())
+            sup_id = [item[1] for item in self.sups if item[0] == self.selected_sup][0]
+            self.entry_sup_id.delete(0, tkinter.END)
+            self.entry_sup_id.insert(0, sup_id)
+        else:
+            self.selected_sup = None
+
+    """Clients"""
+
+    # this function will render in the BillingTopTab Client name and id
+    def update_ClientListabox(self, event):
+        if self.clientlistbox.curselection():
+            self.selected_client = self.clientlistbox.get(self.clientlistbox.curselection())
+            client_id = [item[1] for item in self.clients if item[0] == self.selected_client][0]
+            self.entry_client_id.delete(0, tkinter.END)
+            self.entry_client_id.insert(0, client_id)
+        else:
+            self.selected_client = None
+
 
     ########################################################################################################
 
@@ -286,6 +334,8 @@ class SecondWindow:
         self.itemPriceEntry.delete(0, END)
         self.itemMinStockEntry.delete(0, END)
         self.itemLocationEntry.delete(0, END)
+
+
 
     ##################################################################################################################
 
@@ -563,25 +613,108 @@ class SecondWindow:
         BillingTreeview = ttk.Frame(BillingFrame)
         BillingTreeview.pack(side=tkinter.LEFT)
         ###### TEST For Labels at the top of the treevieww to render information#########
-        lb_title = ttk.Label(BillingTopTab, text='User ID selected : ')
-        lb_title.pack()
-        lb_title = ttk.Label(BillingTopTab, text='Itemfgsf ')
-        lb_title.pack(side=tkinter.RIGHT, padx=10)
-        lb_title = ttk.Label(BillingTopTab, text=' Name')
-        lb_title.pack(side=tkinter.LEFT, padx=10)
-        lb_title = ttk.Label(BillingTopTab, text='Item Name')
-        lb_title.pack(padx=10)
+        """TopFrame to search id and name of: Item, Supplier/Client to make use in the billing form"""
+        """Item id and name"""
+        # self.items = []
+        # for row in item_collection.Item_Name_Id():
+        #     self.items.append((row[1], row[0]))
+        #
+        # self.itemlistbox = tkinter.Listbox(BillingTopTab, width=20, height = 1)
+        # for item in self.items:
+        #     self.itemlistbox.insert(tkinter.END, item[0])
+        #
+        # lb_itemName = ttk.Label(BillingTopTab, text='Item name').pack()
+        #
+        # self.itemlistbox.pack(anchor='w')
+        # self.itemlistbox.bind("<<ListboxSelect>>", self.update_itemListabox)
+        # lb_itemID = ttk.Label(BillingTopTab, text='Item Id').pack()
+        # self.entry_item_id = ttk.Entry(BillingTopTab, width=10)
+        # # self.entry_item_id.pack()#side=tkinter.LEFT
+        # self.entry_item_id.grid(row=2, column=0, sticky='sw')
+        # """Supplier id and name"""
+        # self.sups = []
+        # for row in supplier_collection.Supplier_Name_Id():
+        #     self.sups.append((row[1], row[0]))
+        #
+        # self.suplistbox = tkinter.Listbox(BillingTopTab, width=20, height=1)
+        # for item in self.sups:
+        #     self.suplistbox.insert(tkinter.END, item[0])
+        #
+        # lb_supName = ttk.Label(BillingTopTab, text='Supplier name').pack()
+        #
+        # self.suplistbox.pack(side=tkinter.RIGHT)
+        # self.suplistbox.bind("<<ListboxSelect>>", self.update_SupplierListabox)
+        # lb_itemID = ttk.Label(BillingTopTab, text='Supplier Id').pack()
+        # self.entry_sup_id = ttk.Entry(BillingTopTab, width=10)
+        # self.entry_sup_id.pack(side=tkinter.RIGHT)  # side=tkinter.LEFT
+        self.items = []
+        for row in item_collection.Item_Name_Id():
+            self.items.append((row[1], row[0]))
+
+        self.itemlistbox = tkinter.Listbox(BillingTopTab, width=20, height=1)
+        for item in self.items:
+            self.itemlistbox.insert(tkinter.END, item[0])
+        self.itemlistbox.grid(column=1, row=0, sticky=tkinter.E, padx=5, pady=5)
+
+        lb_itemName = ttk.Label(BillingTopTab, text='Item name')
+        lb_itemName.grid(column=0, row=0, sticky=tkinter.W, padx=5, pady=5)
+
+        # to render the id in the self.entry_item_id
+        self.itemlistbox.bind("<<ListboxSelect>>", self.update_itemListabox)
+
+        lb_itemID = ttk.Label(BillingTopTab, text='Item Id')
+        lb_itemID.grid(column=0, row=1, sticky=tkinter.W)
+
+        self.entry_item_id = ttk.Entry(BillingTopTab, width=10)
+        self.entry_item_id.grid(column=1, row=1, sticky=tkinter.E)
+
+        """Supplier id and name"""
+        self.sups = []
+        for row in supplier_collection.Supplier_Name_Id():
+            self.sups.append((row[1], row[0]))
+
+        self.suplistbox = tkinter.Listbox(BillingTopTab, width=20, height=1)
+        for item in self.sups:
+            self.suplistbox.insert(tkinter.END, item[0])
+        self.suplistbox.grid(column=4, row=0, sticky=tkinter.W, padx=5, pady=5)
+
+        lb_supName = ttk.Label(BillingTopTab, text='Supplier name')
+        lb_supName.grid(column=3, row=0, sticky=tkinter.W, padx=5, pady=5)
+
+        # to render the id in the  self.entry_sup_id
+        self.suplistbox.bind("<<ListboxSelect>>", self.update_SupplierListabox)
+
+        lb_supID = ttk.Label(BillingTopTab, text='Supplier Id')
+        lb_supID.grid(column=3, row=1, sticky=tkinter.W, padx=5, pady=5)
+
+        self.entry_sup_id = ttk.Entry(BillingTopTab, width=10)
+        self.entry_sup_id.grid(column=4, row=1, sticky=tkinter.E, padx=5, pady=5)
+
+        """Client id and name"""
+        self.clients= []
+        for row in client_collection.Client_Name_Id():
+            self.clients.append((row[1], row[0]))
+
+        self.clientlistbox = tkinter.Listbox(BillingTopTab, width=20, height=1)
+        for item in self.clients:
+            self.clientlistbox.insert(tkinter.END, item[0])
+        self.clientlistbox.grid(column=6, row=0, sticky=tkinter.W, padx=5, pady=5)
+
+        lb_clientName = ttk.Label(BillingTopTab, text='Client name')
+        lb_clientName.grid(column=5, row=0, sticky=tkinter.W, padx=5, pady=5)
+
+        # to render the id in the  self.entry_client_id
+        self.clientlistbox.bind("<<ListboxSelect>>", self.update_ClientListabox)
+
+        lb_clientID = ttk.Label(BillingTopTab, text='Client Id')
+        lb_clientID.grid(column=5, row=1, sticky=tkinter.W, padx=5, pady=5)
+
+        self.entry_client_id = ttk.Entry(BillingTopTab, width=10)
+        self.entry_client_id.grid(column=6, row=1, sticky=tkinter.E, padx=5, pady=5)
+
         #####################################################
-        ###############test insert in treeview
-        lis = []
-        for i in range(1, 50):
-            itemlist = (
-            f'{i}', "object", "17/02/2023", "supplier", 100 + (i * 4), f"${2 + i}", 5 * i, "level 1",
-            f'{i*2}%', 'trhsfghsfgbhsfgbafcvarvfvafvafva afvgasfavbsf asfdvasfv ', f'ID{i}')
-            lis.append(itemlist)
-        print(lis)
-        # item_tree.insert('','end', text=itemlist[0], values=itemlist[0:])
-        ######################## ITEM TREEVIEW
+
+        ######################## Billing TREEVIEW
 
         self.billing_tree = ttk.Treeview(BillingTreeview, height=18, columns=(
             "Reference ID", "Entrance/Exit", "Company ID", "Item ID", "Item Name", "Quantity", "Price",
@@ -725,15 +858,15 @@ class SecondWindow:
         btn_InsertBill.pack(side=tkinter.TOP)
         btn_InsertBill.bind("<Return>", lambda event: self.insertBill()(btn_InsertBill["Insert"]))
         #UPDATE BUTTON
-        btn_UpdateBill = ttk.Button(BillingTab, text="Update")
+        btn_UpdateBill = ttk.Button(BillingTab, text="Update", command = lambda : "")
         btn_UpdateBill.pack(side=tkinter.TOP)
         btn_UpdateBill.bind("<Return>", lambda event: self.updateBill()(btn_InsertBill["Update"]))
         # SHOW BUTTON
-        btn_BillShow = ttk.Button(BillingTab, text="Show",command = lambda : self.insertBill())
+        btn_BillShow = ttk.Button(BillingTab, text="Show",command = lambda : self.showBill())
         btn_BillShow.pack(side=tkinter.LEFT)
         btn_BillShow.bind("<Return>", lambda event: self.showBill()(btn_BillShow["Show"]))
         # Clear button
-        btn_BillClear = ttk.Button(BillingTab, text="Clear", command=lambda: self.clearItem())
+        btn_BillClear = ttk.Button(BillingTab, text="Clear", command=lambda: self.clearBill())
         btn_BillClear.pack(side=tkinter.BOTTOM)
         btn_BillClear.bind("<Return>", lambda event: self.clearBill()(btn_BillClear["Clear"]))
         ####
@@ -756,16 +889,34 @@ class SecondWindow:
         itemTreeview.pack(side=tkinter.RIGHT)
 ###### TEST For Labels at the top of the treevieww to render information#########
 
+
         lb_title = ttk.Label(itemTopTab, text='Selection:', font=('',16,'bold'))
         lb_title.pack()
         lb_1Title = ttk.Label(itemTopTab, text='Code Id: ', font=('',12,'bold'))
-        lb_1Title.pack(side=tkinter.LEFT )
-        lb_titleItemId = ttk.Label(itemTopTab, text='', background='white', font=('',14,'bold'))
-        lb_titleItemId.pack(side=tkinter.LEFT )
-        lb_2Title = ttk.Label(itemTopTab, text='     Name:', font=('',12,'bold'))
-        lb_2Title.pack(side=tkinter.LEFT)
-        lb_titleItemName = ttk.Label(itemTopTab, text='',background='white')
-        lb_titleItemName.pack(side=tkinter.LEFT)
+        self.spinbox_id = tkinter.IntVar()
+        entry = ttk.Entry(itemTopTab, textvariable=self.spinbox_id)
+        entry.pack()
+
+        # lb_1Title.pack(side=tkinter.LEFT )
+        # lb_titleItemId = ttk.Label(itemTopTab, text='', background='white', font=('',14,'bold'))
+        # lb_titleItemId.pack(side=tkinter.LEFT )
+
+        # """Items Spinbox"""
+        # self.items = []
+        # # c.execute("SELECT code_id, item_name FROM inventory_items")
+        # for row in item_collection.Item_Name_Id():
+        #     self.items.append((row[1], row[0]))
+        #
+        # self.spinbox_ItemName = tkinter.StringVar()
+        # self.spinbox = ttk.Spinbox(itemTopTab, textvariable=self.spinbox_ItemName, values=[item[0] for item in self.items],
+        #                            command=self.update_spinbox)
+        # self.spinbox.pack()
+
+
+        # lb_2Title = ttk.Label(itemTopTab, text='     Name:', font=('',12,'bold'))
+        # lb_2Title.pack(side=tkinter.LEFT)
+        # lb_titleItemName = ttk.Label(itemTopTab, text='',background='white')
+        # lb_titleItemName.pack(side=tkinter.LEFT)
         lb_3Title = ttk.Label(itemTopTab, text='     Description:', font=('',12,'bold'))
         lb_3Title.pack(side=tkinter.LEFT)
         lb_titleItemDescription = ttk.Label(itemTopTab, text='',background='white')
@@ -894,9 +1045,9 @@ class SecondWindow:
             """Render selected row in the treeviw at the TopFrame"""
             ############################################
             # Code ID
-            lb_titleItemId.config(text=select_ItemIdValue[0])
+            # entry.config(text=select_ItemIdValue[0])
             # Item Name
-            lb_titleItemName.config(text=select_ItemIdValue[1])
+            # lb_titleItemName.config(text=select_ItemIdValue[1])
             # Item Description
             lb_titleItemDescription.config(text=select_ItemIdValue[2])
             # Supplier ID
