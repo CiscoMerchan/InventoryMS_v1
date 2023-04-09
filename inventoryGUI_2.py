@@ -1,22 +1,220 @@
 # Here will be the frame to operate the inventory
 import tkinter
 from sys import path
-from tkinter import ttk, messagebox, END, Text, Radiobutton
+from tkinter import ttk, messagebox, END, Text, Radiobutton, Listbox,StringVar, IntVar
 import tkcalendar as tkcalendar
 from datetime import datetime
 from accesory import CreateToolTip
 # Import DATABASE
-from usersBD import UserDb, SupplierDB, ClientDB, ItemDB
+from usersBD import UserDb, SupplierDB, ClientDB, ItemDB, BillingDB
 #Acces to _users TABLE
 client_collection = ClientDB()
 user_collection = UserDb()
 supplier_collection = SupplierDB()
 item_collection = ItemDB()
+billing_collection = BillingDB()
 from backend_user import User
 
 ID = ""
 LABELS = ("",12, '')
 class SecondWindow:
+    ##################################$$$$$$$$$$$$  Billing  $$$$$$$$$$$$$$$$#######################################
+
+
+    """ When user click on Show button this will display the whole data from inventory_suppliers TABLE"""
+    #fuction call  by Show Button
+    def showBill(self):
+        # 1- first clear the data in treeview (otherwise the data in treeview will be repeated)
+        for bill in self.billing_tree.get_children():
+            self.billing_tree.delete(bill)
+        # 2- fetch data from DB
+        allbills = billing_collection.allBill()
+
+        for row in allbills:
+            # 3- INSERTION OF VALUES FROM DB TO TREEVIEEW
+            self.billing_tree.insert('', 'end', text=row[0], values=row[0:])
+
+    """Insert new Bill. button INSERT"""
+    def insertBill(self):
+
+        # logged user Name
+        username_in_the_system = self.user_name
+        # logged user ID
+        username_in_the_systemID = int(self.user_id)
+        # print(self.get_billType())
+        ### Entries data
+        # This catch the choice in radiobutton
+        billType = self.BILLING.get()
+        print(billType)
+        # Bill reference number
+        billCode = self.BillCodeEntry.get()
+        # Name of the company Client or Supplier
+        billCompanyId = self.BillCompanyIdEntry.get()
+        # Item ID
+        billItemId = self.BillItemIdEntry.get()
+        # Item name
+        billItemName = self.BillItemNameEntry.get()
+        # Qty of the item to in or out of the stock
+        billQty = self.BillQtyEntry.get()
+        #Item price
+        billPrice = self.BillPriceEntry.get()
+        #If didcount on the item price
+        billDiscount = self.BillDiscountEntry.get()
+        #description on the bill transaction
+        billDescription = self.BillDescriptionEntry.get("1.0", "end")
+        # date that the bill is inserted
+        dateIn = datetime.today().strftime('%m/%d/%Y')
+        # date when the order was made
+        billDate = self.date.get_date()
+
+        # """FIRST CHECK. this function check if the billCode already exist in the DB   """
+        # checkBillCode = billing_collection.checkId(billCode)
+        # if checkBillCode == False:
+        #     messagebox.showerror('ERROR',"The Reference Number for")
+        # check if any entry case is empty
+        if (billCode == '' or billCompanyId == '' or billItemId == '' or billItemName == '' or billQty == '' or
+            billPrice == '' or  billDiscount == ''  ):
+            #maybe to specify in the message with Entry case are mandatory
+            messagebox.showerror("Error", "All the entry case must be filled!")
+        # if all the data is correct
+        else:
+            """update_result is avariable that takes parameters to update the item quantity and at the same time,
+            check if there is more than the bill quantity, in case there is not enough items it will return false 
+            and let know the user that the operation is not possible"""
+            update_result = item_collection.updateItemQty(itemID=billItemId,BillType=billType, BillQty=billQty)
+            #if the billQty is > that the item quantity
+            if update_result == False:
+                 messagebox.showerror('ERROR', f"Sorry the quantity of the bill: {billCode} is superior to "
+                                                  f"the quantity in the store!")
+
+            else:
+                print(str(update_result)+ " Item quantity updated successfully")
+                confirmation = messagebox.askyesno('Confirm',
+                                f"{username_in_the_system} Do you want to create the Bill Reference: {billCode}\n\n"
+                                f"Item name: {billItemName} \n\n to/from Company ID: {billCompanyId} \n\n "
+                                f"Item: {billItemName} \n\n Quantity: { billQty} \n\n "
+                                f"Price: {billPrice} \n\n Discount:{billDiscount} \n\n "
+                                )
+                if confirmation:
+                    billing_collection.in_newBill(billCode,billType,billCompanyId,billItemId, billItemName, int(billQty),
+                                                  billPrice, billDiscount, dateIn, billDate, billDescription,
+                                                  username_in_the_systemID )
+                    messagebox.showinfo("Bill Done", f"Bill number: '{billCode}' Save!")
+            # this can be used to let know the user that the data of this id have been well inserted. With a messagebox
+                    print(billing_collection.in_newBill)
+                    if billing_collection.in_newBill:
+                        self.BillCodeEntry.delete(0,END)
+                        self.BillCompanyIdEntry.delete(0,END)
+                        self.BillItemIdEntry.delete(0,END)
+                        self.BillItemNameEntry.delete(0,END)
+                        self.BillQtyEntry.delete(0,END)
+                        self.BillPriceEntry.delete(0,END)
+                        self.BillDiscountEntry.delete(0,END)
+                        self.BillDescriptionEntry.delete('1.0','end')
+
+    """Update Item description, Qty, price, updateBy, updateDate, minStock or/ and location . button UPDATE"""
+
+    def update_Item(self):
+        pass
+    #     # logged user Name
+    #     username_in_the_system = self.user_name
+    #     # logged user ID
+    #     username_in_the_systemID = int(self.user_id)
+    #
+    #     # Entries data
+    #     itemCode = self.itemCodeEntry.get()
+    #     itemDescription = self.itemDescriptionEntry.get()
+    #     itemQty = self.itemQuantityEntry.get()
+    #     itemPrice = self.itemPriceEntry.get()
+    #     dateUpdate = datetime.today().strftime('%m/%d/%Y')
+    #     itemMinStock = self.itemMinStockEntry.get()
+    #     itemLocation = self.itemLocationEntry.get()
+    #     #  Item code ID is mandatory
+    #     if (
+    #             itemCode == "" or itemDescription == "" or itemQty == "" or itemPrice == "" or
+    #             itemMinStock == "" or itemLocation == ""):
+    #         print(itemCode, itemDescription, itemQty, itemPrice, dateUpdate, itemMinStock, itemLocation)
+    #         messagebox.showerror("ERROR",
+    #                              "No empty case in: Item code, Description , Quantity, Price, Min.Stock or Location  entries")
+    #     else:
+    #         # Confirme the change to update
+    #         confirmeUpdate = messagebox.askokcancel("Confirmation",
+    #                                                 f" {username_in_the_system}: You are Updating Item {itemCode} the :"
+    #                                                 f"\n\nDescription: {itemDescription}, \n\n Quantity: {itemQty} \n\n"
+    #                                                 f"Price: {itemPrice}\n\n Min. Stock: {itemMinStock} \n\n "
+    #                                                 f"Location: {itemLocation}")
+    #         if confirmeUpdate:
+    #             item_collection.updateItem(itemCode, itemDescription, itemQty, itemPrice, username_in_the_systemID,
+    #                                        dateUpdate, itemMinStock, itemLocation)
+    #             # data have been updated
+    #             messagebox.showinfo('Info', 'Update save ')
+    #             # After the data have been updated clear the Entry widgets
+    #             self.itemCodeEntry.delete(0, END)
+    #             self.itemNameEntry.delete(0, END)
+    #             self.itemDescriptionEntry.delete(0, END)
+    #             self.itemSupplierIdEntry.delete(0, END)
+    #             self.itemQuantityEntry.delete(0, END)
+    #             self.itemPriceEntry.delete(0, END)
+    #             self.itemMinStockEntry.delete(0, END)
+    #             self.itemLocationEntry.delete(0, END)
+    #         else:
+    #             messagebox.showwarning("Info", f"No change have been made for Item code id: {itemCode}")
+
+    # Funtion to clear the Entry boxes
+    def clearBill(self):
+        self.BillCodeEntry.delete(0, END)
+        self.BillCompanyIdEntry.delete(0, END)
+        self.BillItemIdEntry.delete(0, END)
+        self.BillItemNameEntry.delete(0, END)
+        self.BillQtyEntry.delete(0, END)
+        self.BillPriceEntry.delete(0, END)
+        self.BillDiscountEntry.delete(0, END)
+        self.BillDescriptionEntry.delete('1.0', 'end')
+
+    #######################Listbox ###############################################################################
+    """In this area will have 3 function to render at the topFrame a listbox with name and id for: 
+        - Items
+        - Suppliers
+        - Clients
+    THis will help the user to find in one placethe necessary item id and the company name (Supplier or Client) to
+    used as input in the billing form. """
+
+    """Item"""
+    # this function will render in the BillingTopTab item name and id
+    def update_itemListabox(self, event):
+        if self.itemlistbox.curselection():
+            self.selected_item = self.itemlistbox.get(self.itemlistbox.curselection())
+            item_id = [item[1] for item in self.items if item[0] == self.selected_item][0]
+            self.entry_item_id.delete(0, tkinter.END)
+            self.entry_item_id.insert(0, item_id)
+        else:
+            self.selected_item = None
+    """Supplier"""
+
+    # this function will render in the BillingTopTab Supplier name and id
+    def update_SupplierListabox(self, event):
+        if self.suplistbox.curselection():
+            self.selected_sup = self.suplistbox.get(self.suplistbox.curselection())
+            sup_id = [item[1] for item in self.sups if item[0] == self.selected_sup][0]
+            self.entry_sup_id.delete(0, tkinter.END)
+            self.entry_sup_id.insert(0, sup_id)
+        else:
+            self.selected_sup = None
+
+    """Clients"""
+
+    # this function will render in the BillingTopTab Client name and id
+    def update_ClientListabox(self, event):
+        if self.clientlistbox.curselection():
+            self.selected_client = self.clientlistbox.get(self.clientlistbox.curselection())
+            client_id = [item[1] for item in self.clients if item[0] == self.selected_client][0]
+            self.entry_client_id.delete(0, tkinter.END)
+            self.entry_client_id.insert(0, client_id)
+        else:
+            self.selected_client = None
+
+
+    ########################################################################################################
 
     ##################################$$$$$$$$$$$$  ITEMS  $$$$$$$$$$$$$$$$#######################################
     """ When user click on Show button this will display the whole data from inventory_suppliers TABLE"""
@@ -136,6 +334,11 @@ class SecondWindow:
         self.itemPriceEntry.delete(0, END)
         self.itemMinStockEntry.delete(0, END)
         self.itemLocationEntry.delete(0, END)
+
+
+
+    ##################################################################################################################
+
     ##################################$$$$$$$$$$$$  SUPPLIER  $$$$$$$$$$$$$$$$#######################################
     """ When user click on Show button this will display the whole data from inventory_suppliers TABLE"""
     def showSupplier(self):
@@ -408,120 +611,270 @@ class SecondWindow:
         BillingTab.pack(side=tkinter.LEFT)
         #### RIGHT FRAME FOR TREEVIEW AND SCROLLBAR ############################################
         BillingTreeview = ttk.Frame(BillingFrame)
-        BillingTreeview.pack(side=tkinter.RIGHT)
+        BillingTreeview.pack(side=tkinter.LEFT)
         ###### TEST For Labels at the top of the treevieww to render information#########
-        lb_title = ttk.Label(BillingTopTab, text='User ID selected : ')
-        lb_title.pack()
-        lb_title = ttk.Label(BillingTopTab, text='Itemfgsf ')
-        lb_title.pack(side=tkinter.RIGHT, padx=10)
-        lb_title = ttk.Label(BillingTopTab, text=' Name')
-        lb_title.pack(side=tkinter.LEFT, padx=10)
-        lb_title = ttk.Label(BillingTopTab, text='Item Name')
-        lb_title.pack(padx=10)
+        """TopFrame to search id and name of: Item, Supplier/Client to make use in the billing form"""
+        """Item id and name"""
+        # self.items = []
+        # for row in item_collection.Item_Name_Id():
+        #     self.items.append((row[1], row[0]))
+        #
+        # self.itemlistbox = tkinter.Listbox(BillingTopTab, width=20, height = 1)
+        # for item in self.items:
+        #     self.itemlistbox.insert(tkinter.END, item[0])
+        #
+        # lb_itemName = ttk.Label(BillingTopTab, text='Item name').pack()
+        #
+        # self.itemlistbox.pack(anchor='w')
+        # self.itemlistbox.bind("<<ListboxSelect>>", self.update_itemListabox)
+        # lb_itemID = ttk.Label(BillingTopTab, text='Item Id').pack()
+        # self.entry_item_id = ttk.Entry(BillingTopTab, width=10)
+        # # self.entry_item_id.pack()#side=tkinter.LEFT
+        # self.entry_item_id.grid(row=2, column=0, sticky='sw')
+        # """Supplier id and name"""
+        # self.sups = []
+        # for row in supplier_collection.Supplier_Name_Id():
+        #     self.sups.append((row[1], row[0]))
+        #
+        # self.suplistbox = tkinter.Listbox(BillingTopTab, width=20, height=1)
+        # for item in self.sups:
+        #     self.suplistbox.insert(tkinter.END, item[0])
+        #
+        # lb_supName = ttk.Label(BillingTopTab, text='Supplier name').pack()
+        #
+        # self.suplistbox.pack(side=tkinter.RIGHT)
+        # self.suplistbox.bind("<<ListboxSelect>>", self.update_SupplierListabox)
+        # lb_itemID = ttk.Label(BillingTopTab, text='Supplier Id').pack()
+        # self.entry_sup_id = ttk.Entry(BillingTopTab, width=10)
+        # self.entry_sup_id.pack(side=tkinter.RIGHT)  # side=tkinter.LEFT
+        self.items = []
+        for row in item_collection.Item_Name_Id():
+            self.items.append((row[1], row[0]))
+
+        self.itemlistbox = tkinter.Listbox(BillingTopTab, width=20, height=1)
+        for item in self.items:
+            self.itemlistbox.insert(tkinter.END, item[0])
+        self.itemlistbox.grid(column=1, row=0, sticky=tkinter.E, padx=5, pady=5)
+
+        lb_itemName = ttk.Label(BillingTopTab, text='Item name')
+        lb_itemName.grid(column=0, row=0, sticky=tkinter.W, padx=5, pady=5)
+
+        # to render the id in the self.entry_item_id
+        self.itemlistbox.bind("<<ListboxSelect>>", self.update_itemListabox)
+
+        lb_itemID = ttk.Label(BillingTopTab, text='Item Id')
+        lb_itemID.grid(column=0, row=1, sticky=tkinter.W)
+
+        self.entry_item_id = ttk.Entry(BillingTopTab, width=10)
+        self.entry_item_id.grid(column=1, row=1, sticky=tkinter.E)
+
+        """Supplier id and name"""
+        self.sups = []
+        for row in supplier_collection.Supplier_Name_Id():
+            self.sups.append((row[1], row[0]))
+
+        self.suplistbox = tkinter.Listbox(BillingTopTab, width=20, height=1)
+        for item in self.sups:
+            self.suplistbox.insert(tkinter.END, item[0])
+        self.suplistbox.grid(column=4, row=0, sticky=tkinter.W, padx=5, pady=5)
+
+        lb_supName = ttk.Label(BillingTopTab, text='Supplier name')
+        lb_supName.grid(column=3, row=0, sticky=tkinter.W, padx=5, pady=5)
+
+        # to render the id in the  self.entry_sup_id
+        self.suplistbox.bind("<<ListboxSelect>>", self.update_SupplierListabox)
+
+        lb_supID = ttk.Label(BillingTopTab, text='Supplier Id')
+        lb_supID.grid(column=3, row=1, sticky=tkinter.W, padx=5, pady=5)
+
+        self.entry_sup_id = ttk.Entry(BillingTopTab, width=10)
+        self.entry_sup_id.grid(column=4, row=1, sticky=tkinter.E, padx=5, pady=5)
+
+        """Client id and name"""
+        self.clients= []
+        for row in client_collection.Client_Name_Id():
+            self.clients.append((row[1], row[0]))
+
+        self.clientlistbox = tkinter.Listbox(BillingTopTab, width=20, height=1)
+        for item in self.clients:
+            self.clientlistbox.insert(tkinter.END, item[0])
+        self.clientlistbox.grid(column=6, row=0, sticky=tkinter.W, padx=5, pady=5)
+
+        lb_clientName = ttk.Label(BillingTopTab, text='Client name')
+        lb_clientName.grid(column=5, row=0, sticky=tkinter.W, padx=5, pady=5)
+
+        # to render the id in the  self.entry_client_id
+        self.clientlistbox.bind("<<ListboxSelect>>", self.update_ClientListabox)
+
+        lb_clientID = ttk.Label(BillingTopTab, text='Client Id')
+        lb_clientID.grid(column=5, row=1, sticky=tkinter.W, padx=5, pady=5)
+
+        self.entry_client_id = ttk.Entry(BillingTopTab, width=10)
+        self.entry_client_id.grid(column=6, row=1, sticky=tkinter.E, padx=5, pady=5)
+
         #####################################################
-        ###############test insert in treeview
-        lis = []
-        for i in range(1, 50):
-            itemlist = (
-            f'{i}', "object", "17/02/2023", "supplier", 100 + (i * 4), f"${2 + i}", 5 * i, "level 1",
-            f'{i*2}%', 'trhsfghsfgbhsfgbafcvarvfvafvafva afvgasfavbsf asfdvasfv ', f'ID{i}')
-            lis.append(itemlist)
-        print(lis)
-        # item_tree.insert('','end', text=itemlist[0], values=itemlist[0:])
-        ######################## ITEM TREEVIEW
 
-        Billing_tree = ttk.Treeview(BillingTreeview, height=18, columns=(
-            "Reference ID", "Type of Transaction", "Date", "Company ID", "Item ID", "Item Name", "Quantity", "Price",
-            "Discount", "Description", "UserID"), show="headings")
-        Billing_tree.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
-        # item_tree.insert('', 'end', text=itemlist[0], values=lis[0:])   # Insert data into the treeview
-        for row in lis:
-            Billing_tree.insert('', 'end', values=row)  # test Insert data into the treeview
+        ######################## Billing TREEVIEW
+
+        self.billing_tree = ttk.Treeview(BillingTreeview, height=18, columns=(
+            "Reference ID", "Entrance/Exit", "Company ID", "Item ID", "Item Name", "Quantity", "Price",
+            "Discount","Date","Created Date", "Description", "UserID"), show="headings")
+        self.billing_tree.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
+        # fetch data from DB
+        allbills = billing_collection.allBill()
+
+        for row in allbills:
+            # INSERTION OF VALUES FROM DB TO TREEVIEEW
+            """To change the bg on the treeview"""
+            # self.billing_tree.tag_configure('oddrow', background='gray')
+            self.billing_tree.insert('', 'end', text=row[0], values=row[0:] , tags = ('oddrow',))
+            # self.billing_tree.tag_configure('oddrow', background='gray')
         # Scrollbar for the treeview
-        Billing_tree_scroll = ttk.Scrollbar(BillingTreeview, orient="vertical", command=Billing_tree.yview)
-        Billing_tree_scroll.pack(side=tkinter.LEFT, fill=tkinter.Y)
-        Billing_tree.configure(yscrollcommand=Billing_tree_scroll.set)
+        billing_tree_scroll = ttk.Scrollbar(BillingTreeview, orient="vertical", command=self.billing_tree.yview)
+        billing_tree_scroll.pack(side=tkinter.LEFT, fill=tkinter.Y)
+        self.billing_tree.configure(yscrollcommand=billing_tree_scroll.set)
         ##### Heading of the treeview
-        Billing_tree.heading(0, text="Reference ID", anchor='center')
-        Billing_tree.heading(1, text="Type of Transacation", anchor='center')
-        Billing_tree.heading(2, text="Date", anchor='center')
-        Billing_tree.heading(3, text="Company ID", anchor='center')
-        Billing_tree.heading(4, text="Item ID", anchor='center')
-        Billing_tree.heading(5, text="Item Name", anchor='center')
-        Billing_tree.heading(6, text="Quantity", anchor='center')
-        Billing_tree.heading(7, text="Price", anchor='center')
-        Billing_tree.heading(8, text="Discount", anchor='center')
-        Billing_tree.heading(9, text="Description", anchor='center')
-        Billing_tree.heading(10, text="User ID", anchor='center')
+        self.billing_tree.heading(0, text="Reference ID", anchor='center')
+        self.billing_tree.heading(1, text="Entrance/Exit", anchor='center')
+        self.billing_tree.heading(2, text="Company ID", anchor='center')
+        self.billing_tree.heading(3, text="Item ID", anchor='center')
+        self.billing_tree.heading(4, text="Item Name", anchor='center')
+        self.billing_tree.heading(5, text="Quantity", anchor='center')
+        self.billing_tree.heading(6, text="Price", anchor='center')
+        self.billing_tree.heading(7, text="Discount", anchor='center')
+        self.billing_tree.heading(8, text="Date", anchor='center')
+        self.billing_tree.heading(9, text="Created Date", anchor='center')
+        self.billing_tree.heading(10, text="Description", anchor='center')
+        self.billing_tree.heading(11, text="User ID", anchor='center')
         ##### Columns of the treeview
-        Billing_tree.column(0, width=80, anchor='center')
-        Billing_tree.column(1, width=80, anchor='center')
-        Billing_tree.column(2, width=80, anchor='center')
-        Billing_tree.column(3, width=80, anchor='center')
-        Billing_tree.column(4, width=70, anchor='center')
-        Billing_tree.column(5, width=100, anchor='center')
-        Billing_tree.column(6, width=60, anchor='center')
-        Billing_tree.column(7, width=50, anchor='center')
-        Billing_tree.column(8, width=60, anchor='center')
-        Billing_tree.column(9, width=300, anchor='center')
-        Billing_tree.column(10, width=50, anchor='center')
+        self.billing_tree.column(0, width=80, anchor='center')
+        self.billing_tree.column(1, width=80, anchor='center')
+        self.billing_tree.column(2, width=80, anchor='center')
+        self.billing_tree.column(3, width=80, anchor='center')
+        self.billing_tree.column(4, width=80, anchor='center')
+        self.billing_tree.column(5, width=80, anchor='center')
+        self.billing_tree.column(6, width=60, anchor='center')
+        self.billing_tree.column(7, width=60, anchor='center')
+        self.billing_tree.column(8, width=70, anchor='center')
+        self.billing_tree.column(9, width=80, anchor='center')
+        self.billing_tree.column(10, width=250, anchor='center')
+        self.billing_tree.column(11, width=50, anchor='center')
 
-        ################################# ITEMS TAB, LABELS AND ENTRIES
-        inStock = tkinter.IntVar() #If this radiobutton check = 1. else = 0 RADIOBUTTON
-        outStock = tkinter.IntVar() #If this radiobutton check = 1 else = 0 RADIOBUTTON
-        inStock = tkinter.Radiobutton(BillingTab, text="In", variable=inStock, command="")
-        inStock.pack(side=tkinter.TOP)
-        outStock = tkinter.Radiobutton(BillingTab, text="Out", variable=outStock, command="")
-        outStock.pack()
+        ###############################################################
+        ####Select items from the treeview###
+        ###############################################################
+        """this methods is to select,fetch and return data from the clicked row in the treeview """
 
-        date = tkcalendar.DateEntry(BillingTab, width=10)
-        date.pack()
-        lb_ItemCode = ttk.Label(BillingTab, text="Reference Number:")
-        lb_ItemCode.pack()
-        self.BillingCodeEntry = ttk.Entry(BillingTab)
-        self.BillingCodeEntry.pack()
-        lb_ItemName = ttk.Label(BillingTab, text="Company ID:")
-        lb_ItemName.pack()
-        self.BillingNameEntry = ttk.Entry(BillingTab)
-        self.BillingNameEntry.pack()
-        lb_ItemDescription = ttk.Label(BillingTab, text="Item ID:")
-        lb_ItemDescription.pack()
-        self.BillingDescriptionEntry = ttk.Entry(BillingTab)
-        self.BillingDescriptionEntry.pack()
-        lb_ItemDescription = ttk.Label(BillingTab, text="Item Name:")
-        lb_ItemDescription.pack()
-        self.BillingDescriptionEntry = ttk.Entry(BillingTab)
-        self.BillingDescriptionEntry.pack()
-        lb_ItemSupplierId = ttk.Label(BillingTab, text="Quantity:")
-        lb_ItemSupplierId.pack()
-        self.BillingSupplierIdEntry = ttk.Entry(BillingTab)
-        self.BillingSupplierIdEntry.pack()
-        lb_ItemQuantity = ttk.Label(BillingTab, text="Price:")
-        lb_ItemQuantity.pack()
-        self.BillingQuantityEntry = ttk.Entry(BillingTab)
-        self.BillingQuantityEntry.pack()
-        lb_ItemPrice = ttk.Label(BillingTab, text="Discount:")
-        lb_ItemPrice.pack()
-        self.BillingPriceEntry = ttk.Entry(BillingTab)
-        self.BillingPriceEntry.pack()
-        lb_ItemMinStock = ttk.Label(BillingTab, text="Description:")
-        lb_ItemMinStock.pack()
-        self.BillingMinStockEntry = tkinter.Text(BillingTab, width = 20, height = 3)
-        self.BillingMinStockEntry.pack()
+        def treeview_select(event):
+            # FETCH SELECTED ROW
+            select_BillId = event.widget.selection()[0]  # FETCH ALL VALUES OF THE ROW
+            print(select_BillId)
+            select_BillIdValue = event.widget.item(select_BillId)['values']
+            print(select_BillIdValue)
+            """Configuration of the labes at the topframe. When the user clicks one of the row in the treeview the data 
+            from the clicked row will be display at the top. thE VALUE ARE INDEXED"""
 
+            """Rendering the selected row in the treeview into the Entry widgets"""
+            # Bill CODE
+            self.BillCodeEntry.delete(0, END)
+            self.BillCodeEntry.insert(0, select_BillIdValue[0])
+            # Bill company id
+            self.BillCompanyIdEntry.delete(0, END)
+            self.BillCompanyIdEntry.insert(0, select_BillIdValue[2])
+            # Bill item id
+            self.BillItemIdEntry.delete(0, END)
+            self.BillItemIdEntry.insert(0, select_BillIdValue[3])
+            # Bill item name
+            self.BillItemNameEntry.delete(0, END)
+            self.BillItemNameEntry.insert(0, select_BillIdValue[4])
+            # Bill QUANTITY
+            self.BillQtyEntry.delete(0, END)
+            self.BillQtyEntry.insert(0, select_BillIdValue[5])
+            # Bill PRICE
+            self.BillPriceEntry.delete(0, END)
+            self.BillPriceEntry.insert(0, select_BillIdValue[6])
+            # Bill Discount
+            self.BillDiscountEntry.delete(0, END)
+            self.BillDiscountEntry.insert(0, select_BillIdValue[7])
+            # ITEM LOCATION
+            self.BillDescriptionEntry.delete('1.0', 'end')
+            self.BillDescriptionEntry.insert('1.0', select_BillIdValue[9])
+        self.billing_tree.bind('<<TreeviewSelect>>', treeview_select)
+            ############################################
+
+        ################################# BILLING TAB, RADIOBUTTON, LABELS AND ENTRIES
+        ###############RADIOBUTTON#################################################
+        self.BILLING = tkinter.StringVar() #RADIOBUTTON VARIABLE
+        self.BILLING.set('Entrance') #THE DEFAULT
+
+        self.inStock = tkinter.Radiobutton(BillingTab, text="Entrance", variable=self.BILLING, value = 'Entrance', command=lambda : self.insertBill())
+        self.inStock.pack( anchor='w', padx=15)#anchor='w'
+        self.outStock = tkinter.Radiobutton(BillingTab, text="Exit", variable=self.BILLING,value = 'Exit', command=lambda : self.insertBill())
+        self.outStock.pack(anchor='w', padx=15)#side=tkinter.TOP,
+        self.selected_value = None
+
+        ##############################################################################
+        ################LABELS & ENTRIES############################################
+        self.date = tkcalendar.DateEntry(BillingTab, width=10)
+        self.date.pack()
+        lb_BillCode = ttk.Label(BillingTab, text="Reference Number:")
+        lb_BillCode.pack()
+        self.BillCodeEntry = ttk.Entry(BillingTab)
+        self.BillCodeEntry.pack()
+        lb_CompanyId = ttk.Label(BillingTab, text="Company ID:")
+        lb_CompanyId.pack()
+        self.BillCompanyIdEntry = ttk.Entry(BillingTab)
+        self.BillCompanyIdEntry.pack()
+        lb_BillItemId = ttk.Label(BillingTab, text="Item ID:")
+        lb_BillItemId.pack()
+        self.BillItemIdEntry = ttk.Entry(BillingTab)
+        self.BillItemIdEntry.pack()
+        lb_BillItemName = ttk.Label(BillingTab, text="Item Name:")
+        lb_BillItemName.pack()
+        self.BillItemNameEntry = ttk.Entry(BillingTab)
+        self.BillItemNameEntry.pack()
+        lb_BillQty = ttk.Label(BillingTab, text="Quantity:")
+        lb_BillQty.pack()
+        self.BillQtyEntry = ttk.Entry(BillingTab)
+        self.BillQtyEntry.pack()
+        lb_BillPrice = ttk.Label(BillingTab, text="Price:")
+        lb_BillPrice.pack()
+        self.BillPriceEntry = ttk.Entry(BillingTab)
+        self.BillPriceEntry.pack()
+        lb_BillDiscount = ttk.Label(BillingTab, text="Discount:")
+        lb_BillDiscount.pack()
+        self.BillDiscountEntry = ttk.Entry(BillingTab)
+        self.BillDiscountEntry.pack()
+        lb_BillDescription = ttk.Label(BillingTab, text="Description:")
+        lb_BillDescription.pack()
+        self.BillDescriptionEntry = tkinter.Text(BillingTab, width = 18, height = 1)
+        self.BillDescriptionEntry.pack()
+    #######################################################################
 
 
         ###BUTTONS
-        btn_InsertItem = ttk.Button(BillingTab, text="Insert", command = lambda : self.insertItem())
-        btn_InsertItem.pack()
-        btn_UpdateItem = ttk.Button(BillingTab, text="Update")
-        btn_UpdateItem.pack(side=tkinter.RIGHT)
-        btn_ItemShow = ttk.Button(BillingTab, text="Show")
-        btn_ItemShow.pack()
+        #INSERT BUTTON
+        btn_InsertBill = ttk.Button(BillingTab, text="Insert", command = lambda : self.insertBill())
+        btn_InsertBill.pack(side=tkinter.TOP)
+        btn_InsertBill.bind("<Return>", lambda event: self.insertBill()(btn_InsertBill["Insert"]))
+        #UPDATE BUTTON
+        btn_UpdateBill = ttk.Button(BillingTab, text="Update", command = lambda : "")
+        btn_UpdateBill.pack(side=tkinter.TOP)
+        btn_UpdateBill.bind("<Return>", lambda event: self.updateBill()(btn_InsertBill["Update"]))
+        # SHOW BUTTON
+        btn_BillShow = ttk.Button(BillingTab, text="Show",command = lambda : self.showBill())
+        btn_BillShow.pack(side=tkinter.LEFT)
+        btn_BillShow.bind("<Return>", lambda event: self.showBill()(btn_BillShow["Show"]))
+        # Clear button
+        btn_BillClear = ttk.Button(BillingTab, text="Clear", command=lambda: self.clearBill())
+        btn_BillClear.pack(side=tkinter.BOTTOM)
+        btn_BillClear.bind("<Return>", lambda event: self.clearBill()(btn_BillClear["Clear"]))
         ####
         self.notebook.add(BillingFrame, text="Billing")
                   ## END BILLING ###
 ###################################################################
+
+
         """ITEMS"""
         #### MAIN FRAME ######################################################################
         itemFrame = ttk.Frame(self.notebook)
@@ -536,16 +889,34 @@ class SecondWindow:
         itemTreeview.pack(side=tkinter.RIGHT)
 ###### TEST For Labels at the top of the treevieww to render information#########
 
+
         lb_title = ttk.Label(itemTopTab, text='Selection:', font=('',16,'bold'))
         lb_title.pack()
         lb_1Title = ttk.Label(itemTopTab, text='Code Id: ', font=('',12,'bold'))
-        lb_1Title.pack(side=tkinter.LEFT )
-        lb_titleItemId = ttk.Label(itemTopTab, text='', background='white', font=('',14,'bold'))
-        lb_titleItemId.pack(side=tkinter.LEFT )
-        lb_2Title = ttk.Label(itemTopTab, text='     Name:', font=('',12,'bold'))
-        lb_2Title.pack(side=tkinter.LEFT)
-        lb_titleItemName = ttk.Label(itemTopTab, text='',background='white')
-        lb_titleItemName.pack(side=tkinter.LEFT)
+        self.spinbox_id = tkinter.IntVar()
+        entry = ttk.Entry(itemTopTab, textvariable=self.spinbox_id)
+        entry.pack()
+
+        # lb_1Title.pack(side=tkinter.LEFT )
+        # lb_titleItemId = ttk.Label(itemTopTab, text='', background='white', font=('',14,'bold'))
+        # lb_titleItemId.pack(side=tkinter.LEFT )
+
+        # """Items Spinbox"""
+        # self.items = []
+        # # c.execute("SELECT code_id, item_name FROM inventory_items")
+        # for row in item_collection.Item_Name_Id():
+        #     self.items.append((row[1], row[0]))
+        #
+        # self.spinbox_ItemName = tkinter.StringVar()
+        # self.spinbox = ttk.Spinbox(itemTopTab, textvariable=self.spinbox_ItemName, values=[item[0] for item in self.items],
+        #                            command=self.update_spinbox)
+        # self.spinbox.pack()
+
+
+        # lb_2Title = ttk.Label(itemTopTab, text='     Name:', font=('',12,'bold'))
+        # lb_2Title.pack(side=tkinter.LEFT)
+        # lb_titleItemName = ttk.Label(itemTopTab, text='',background='white')
+        # lb_titleItemName.pack(side=tkinter.LEFT)
         lb_3Title = ttk.Label(itemTopTab, text='     Description:', font=('',12,'bold'))
         lb_3Title.pack(side=tkinter.LEFT)
         lb_titleItemDescription = ttk.Label(itemTopTab, text='',background='white')
@@ -674,9 +1045,9 @@ class SecondWindow:
             """Render selected row in the treeviw at the TopFrame"""
             ############################################
             # Code ID
-            lb_titleItemId.config(text=select_ItemIdValue[0])
+            # entry.config(text=select_ItemIdValue[0])
             # Item Name
-            lb_titleItemName.config(text=select_ItemIdValue[1])
+            # lb_titleItemName.config(text=select_ItemIdValue[1])
             # Item Description
             lb_titleItemDescription.config(text=select_ItemIdValue[2])
             # Supplier ID
@@ -886,6 +1257,7 @@ class SecondWindow:
         lb_SupplierName.pack()
         self.supplierNameEntry = ttk.Entry(supplierTab)
         self.supplierNameEntry.pack()
+        lb_Supplier_Details = ttk.Label(supplierTab, text='Contact Details').pack(anchor='w', pady=10, padx=5)
         lb_SupplierAgent = ttk.Label(supplierTab, text="Agent Full Name:")
         lb_SupplierAgent.pack()
         self.supplierAgentEntry = ttk.Entry(supplierTab)
@@ -1041,6 +1413,8 @@ class SecondWindow:
         lb_ClientName.pack()
         self.clientNameEntry = ttk.Entry(clientTab)
         self.clientNameEntry.pack()
+        lb_Client_Details = ttk.Label(clientTab, text= 'Contact Details').pack(anchor='w',pady=10, padx=5)
+
         lb_ClientAgent = ttk.Label(clientTab, text="Agent Full Name:")
         lb_ClientAgent.pack()
         self.clientAgentEntry = ttk.Entry(clientTab)
