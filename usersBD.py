@@ -157,7 +157,7 @@ class SupplierDB:
             f"INSERT INTO  inventory_suppliers (id, supplier_company_name, supplier_company_agent, supplier_agent_phone, supplier_agent_email) VALUES('{id}', '{companyName}', '{companyAgent}', '{agentPhone}', '{agentEmail}') RETURNING id ")
 
         # Get the last inserted id
-        """This return in user_window.py where the messagebox to let know to the user their user ID number alocated by the DB """
+        """This return in where the messagebox to let know to the user their user ID number alocated by the DB """
         insertedSupplier_id = cursor.fetchone()[0]
 
         # Commit the changes to the database
@@ -309,20 +309,109 @@ class ClientDB:
 
 ##############################################################################################
 class ItemDB:
-    def in_newItem(self):
-        pass
+    def in_newItem(self, ItemCode, ItemName, ItemDescription, ItemSupplierId,
+                   ItemQuantity, ItemPrice, User, Date, ItemMinStock, ItemLocation):
+
+        conn.autocommit = True
+        # Creating a cursor object
+        cursor = conn.cursor()
+        # INSERT
+        cursor.execute(
+        f"INSERT INTO  inventory_items ( code_id, item_name, item_description, supplier_id, item_available, item_price,"
+        f"created_user_id, item_created_date, item_min_stock, item_location) "
+        f"VALUES('{ItemCode}', '{ItemName}', '{ItemDescription}', '{ItemSupplierId}', '{ItemQuantity}', '{ItemPrice}',"
+        f" {User},'{Date}','{ItemMinStock}', '{ItemLocation}') RETURNING code_id ")
+
+        # Get the last inserted id
+        """This return where the messagebox to let know to the user their  ID number alocated by the DB """
+        insertedItem_Code = cursor.fetchone()[0]
+
+        # Commit the changes to the database
+        conn.commit()
+        # possibilite to have the ID of the last inserted Supplier
+
+        return insertedItem_Code
+    # Close the cursor and connection
+    # cursor.close()
+    # conn.close()
+    print("Supplier data been created successfully in inventory_items TABLE  ")
 
     def checkItem(self):
         pass
 
     def allItems(self):
-        pass
+        conn.autocommit = True
+        # Creating a cursor object
+        cursor = conn.cursor()
+        # INSERT
+        cursor.execute("SELECT * FROM inventory_items ORDER BY code_id ASC; ")
+
+        # Get the last inserted id
+        """This return all the data from inventory_items TABLE """
+        dataItems = cursor.fetchall()
+
+        # Commit the changes to the database
+        conn.commit()
+        return dataItems
 
     def a_item(self):
         pass
 
-    def updateItem(self):
-        pass
+    def updateItem(self, code_id, description = None, Qty = None, price = None, updateBy = None, updateDate = None,
+                   minStock = None,location = None):
+        query = "UPDATE inventory_items SET item_description = %s, item_available = %s, item_price = %s, " \
+                "updated_user_id = %s, item_updated_date = %s, item_min_stock = %s, item_location = %s" \
+                " WHERE code_id = %s;"
+
+        # Select the current values for the other columns
+        select_query = "SELECT item_description, item_available, item_price, updated_user_id, item_updated_date," \
+                       " item_min_stock, item_location FROM inventory_items WHERE code_id = %s;"
+
+        # Collect the values for the SQL queries
+        update_values = []
+        if description  is not None:
+            update_values.append(description)
+        else:
+            update_values.append(None)
+        if Qty is not None:
+            update_values.append(Qty)
+        else:
+            update_values.append(None)
+        if price is not None:
+            update_values.append(price)
+        else:
+            update_values.append(None)
+        if updateBy is not None:
+            update_values.append(updateBy)
+        else:
+            update_values.append(None)
+        if updateDate is not None:
+            update_values.append(updateDate)
+        else:
+            update_values.append(None)
+        if minStock is not None:
+            update_values.append(minStock)
+        else:
+            update_values.append(None)
+        if location is not None:
+            update_values.append(location)
+        else:
+            update_values.append(None)
+        update_values.append(code_id)
+
+        # Execute the SQL queries
+        cursor = conn.cursor()
+        cursor.execute(select_query, (code_id,))
+        existing_values = cursor.fetchone()
+        query_values = tuple(update_values)
+        if None in query_values:
+            query_values = tuple(v if v is not None else existing_values[i] for i, v in enumerate(query_values))
+        cursor.execute(query, query_values)
+        conn.commit()
+        cursor.close()
+    ############################################################################################
+
+
 ############################################################################################
 
 ##############################################################################################
