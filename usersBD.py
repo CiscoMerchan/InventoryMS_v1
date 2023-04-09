@@ -13,6 +13,23 @@ class UserDb:
     conn.autocommit = True
     # Creating a cursor object
     cursor = conn.cursor()
+
+    ############All the data from the table to render in the treeviw####
+
+    def userAll(self):
+        conn.autocommit = True
+        # Creating a cursor object
+        cursor = conn.cursor()
+        # INSERT
+        cursor.execute("SELECT * FROM _users ORDER BY user_id ASC; ")
+
+        # Get the last inserted id
+        """This return all the data in _users TABLE """
+        dataUsers = cursor.fetchall()
+
+        # Commit the changes to the database
+        conn.commit()
+        return dataUsers
     ########################################## INSERT AND VERIFICATION #####################################
     " This function is to INSERT Users values INTO _users TABLES   "
     def user_data_collection(self, firstname, lastname, email):
@@ -96,6 +113,253 @@ class UserDb:
 
 ###########################################  UPDATE ###################################################
 
-    def update(self):
+    def updateUser(self, id , email):
+        # try:
+        conn.autocommit = True
+        # Creating a cursor object
+        cursor = conn.cursor()
+        # SELECT QUERY
+        print(f"before sql {id}  {email}")
+        sql = (f"UPDATE _users SET user_email = '{email}' WHERE user_id = {int(id)}")
+        print(f"after sql {id}  {email}")
+        # executing above query
+        cursor.execute(sql)
+        print(f"after execution sql sql {id}  {email}")
+        cursor.fetchone()
+
+        # If a result is returned, return True
+        # if result[0] == int(_user_id) and result[1] == _user_name:
+        print("BD.OK")
+        # if self.result:
+        #     callback(True)
+        #     return self.result
+        #     print(str(result) + 'dbOK')
+        # If no result is returned, return False
+        # else:
+        #     callback(False)
+        # print(str(result) + 'dbNO')
+        # Catch and print any errors that occur while connecting to the database
+        """$$ Once the except is active it take over the TRY: *** To check """
+    # except (Exception, psycopg2.Error) as error:
+    #     # callback(False)
+    #
+############################################################################################
+
+##############################################################################################
+class SupplierDB:
+    """Insert new supplier in inventory_suppliers TABLE """
+    def in_newSupplier(self, id,companyName,companyAgent,agentPhone,agentEmail):
+        conn.autocommit = True
+        # Creating a cursor object
+        cursor = conn.cursor()
+        # INSERT
+        cursor.execute(
+            f"INSERT INTO  inventory_suppliers (id, supplier_company_name, supplier_company_agent, supplier_agent_phone, supplier_agent_email) VALUES('{id}', '{companyName}', '{companyAgent}', '{agentPhone}', '{agentEmail}') RETURNING id ")
+
+        # Get the last inserted id
+        """This return in user_window.py where the messagebox to let know to the user their user ID number alocated by the DB """
+        insertedSupplier_id = cursor.fetchone()[0]
+
+        # Commit the changes to the database
+        conn.commit()
+        #possibilite to have the ID of the last inserted Supplier
+        return insertedSupplier_id
+              # Close the cursor and connection
+        # cursor.close()
+        # conn.close()
+        print("Supplier data been created successfully in inventory_suppliers TABLE  ")
+
+    def checkSupplier(self):
         pass
 
+    def allSuppliers(self):
+        conn.autocommit = True
+        # Creating a cursor object
+        cursor = conn.cursor()
+        # INSERT
+        cursor.execute("SELECT * FROM inventory_suppliers ORDER BY id ASC; ")
+
+        # Get the last inserted id
+        """This return all the data from inventory_suppliers TABLE """
+        dataSuppliers = cursor.fetchall()
+
+        # Commit the changes to the database
+        conn.commit()
+        return dataSuppliers
+
+    def a_Supplier(self):
+        pass
+
+    # A function to update only the last 3 columns of a row
+    def updateSupplier(self, id, Agent=None, Phone=None, Email=None):
+        # SQL query with placeholders for the columns to update
+        query = "UPDATE inventory_suppliers SET supplier_company_agent = %s, supplier_agent_phone = %s, supplier_agent_email = %s WHERE id = %s;"
+
+        # Select the current values for the other columns
+        select_query = "SELECT supplier_company_agent, supplier_agent_phone, supplier_agent_email FROM inventory_suppliers WHERE id = %s;"
+
+        # Collect the values for the SQL queries
+        update_values = []
+        if Agent is not None:
+            update_values.append(Agent)
+        else:
+            update_values.append(None)
+        if Phone is not None:
+            update_values.append(Phone)
+        else:
+            update_values.append(None)
+        if Email is not None:
+            update_values.append(Email)
+        else:
+            update_values.append(None)
+        update_values.append(id)
+
+        # Execute the SQL queries
+        cursor = conn.cursor()
+        cursor.execute(select_query, (id,))
+        existing_values = cursor.fetchone()
+        query_values = tuple(update_values)
+        if None in query_values:
+            query_values = tuple(v if v is not None else existing_values[i] for i, v in enumerate(query_values))
+        cursor.execute(query, query_values)
+        conn.commit()
+        cursor.close()
+############################################################################################
+
+##############################################################################################
+class ClientDB:
+    def in_newClient(self, id, companyName, companyAgent, agentPhone, agentEmail):
+        conn.autocommit = True
+        # Creating a cursor object
+        cursor = conn.cursor()
+        # INSERT
+        cursor.execute(
+        f"INSERT INTO  inventory_clients (id, client_company_name, client_company_agent, client_agent_phone, client_agent_email) VALUES('{id}', '{companyName}', '{companyAgent}', '{agentPhone}', '{agentEmail}') RETURNING id ")
+
+        # Get the last inserted id
+        """This return in  where the messagebox to let know to the user their user ID number alocated by the DB """
+        insertedClient_id = cursor.fetchone()[0]
+
+        # Commit the changes to the database
+        conn.commit()
+        # possibilite to have the ID of the last inserted Supplier
+
+        return insertedClient_id
+        # Close the cursor and connection
+        # cursor.close()
+        # conn.close()
+        print("Client data been created successfully in inventory_clients TABLE  ")
+
+
+    def checkClient(self):
+        pass
+
+    def allClients(self):
+        conn.autocommit = True
+        # Creating a cursor object
+        cursor = conn.cursor()
+        # INSERT
+        cursor.execute("SELECT * FROM inventory_clients ORDER BY id ASC; ")
+
+        # Get the last inserted id
+        """This return all the data from inventory_clients TABLE """
+        dataClients = cursor.fetchall()
+
+        # Commit the changes to the database
+        conn.commit()
+        return dataClients
+
+    def a_Client(self):
+        pass
+
+    def updateClient(self, id, Agent = None, Phone = None, Email = None):
+        # SQL query with placeholders for the columns to update
+        query = "UPDATE inventory_clients SET client_company_agent = %s, client_agent_phone = %s, client_agent_email = %s WHERE id = %s;"
+
+        # Select the current values for the other columns
+        select_query = "SELECT supplier_company_agent, supplier_agent_phone, supplier_agent_email FROM inventory_suppliers WHERE id = %s;"
+
+        # Collect the values for the SQL queries
+        update_values = []
+        if Agent is not None:
+            update_values.append(Agent)
+        else:
+            update_values.append(None)
+        if Phone is not None:
+            update_values.append(Phone)
+        else:
+            update_values.append(None)
+        if Email is not None:
+            update_values.append(Email)
+        else:
+            update_values.append(None)
+        update_values.append(id)
+
+        # Execute the SQL queries
+        cursor = conn.cursor()
+        cursor.execute(select_query, (id,))
+        existing_values = cursor.fetchone()
+        query_values = tuple(update_values)
+        if None in query_values:
+            query_values = tuple(v if v is not None else existing_values[i] for i, v in enumerate(query_values))
+        cursor.execute(query, query_values)
+        conn.commit()
+        cursor.close()
+############################################################################################
+
+##############################################################################################
+class ItemDB:
+    def in_newItem(self):
+        pass
+
+    def checkItem(self):
+        pass
+
+    def allItems(self):
+        pass
+
+    def a_item(self):
+        pass
+
+    def updateItem(self):
+        pass
+############################################################################################
+
+##############################################################################################
+class BillingDB:
+    ######### IN = Ingress in inventory#############
+    def IN_in_newBill(self):
+        pass
+
+    def INcheckBill(self):
+        pass
+
+    def INallBill(self):
+        pass
+
+    def IN_a_Bill(self):
+        pass
+
+    def INupdateBill(self):
+        pass
+############## OUT = Discharge from inventory #########
+    def OUT_in_newBill(self):
+        pass
+
+    def OUTcheckBill(self):
+        pass
+
+    def OUTallBill(self):
+        pass
+
+    def OUT_a_Bill(self):
+        pass
+
+    def OUTupdateBill(self):
+        pass
+
+############################################################################################
+
+##############################################################################################
+class SearchDB:
+    pass

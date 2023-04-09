@@ -5,51 +5,246 @@ from tkinter import ttk, messagebox, END, Text, Radiobutton
 
 import tkcalendar as tkcalendar
 from accesory import CreateToolTip
-from usersBD import UserDb
-collection = UserDb()
+# Import DATABASE
+from usersBD import UserDb, SupplierDB, ClientDB
+#Acces to _users TABLE
+client_collection = ClientDB()
+user_collection = UserDb()
+supplier_collection = SupplierDB()
 from backend_user import User
 
-
+ID = ""
 LABELS = ("",12, '')
 class SecondWindow:
-#######################################$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$########################################
+    ##################################$$$$$$$$$$$$  SUPPLIER  $$$$$$$$$$$$$$$$#######################################
+    """ When user click on Show button this will display the whole data from inventory_suppliers TABLE"""
+    def showSupplier(self):
+        # 1- first clear the data in treeview (otherwise the data in treeview will be repeated)
+        for item in self.supplier_tree.get_children():
+            self.supplier_tree.delete(item)
+        # 2- fetch data from DB
+        allsuppliers = supplier_collection.allSuppliers()
+
+        for row in allsuppliers:
+            # 3- INSERTION OF VALUES FROM DB TO TREEVIEEW
+            self.supplier_tree.insert('', 'end', text=row[0], values=row[0:])
+
+    """Insert new Supplier. button INSERT"""
+    def insertSupplier(self):
+        #Entries data
+        sup_Id = self.supplierIdEntry.get()
+        sup_Name = self.supplierNameEntry.get()
+        sup_Agent = self.supplierAgentEntry.get()
+        sup_Phone = self.supplierTelephoneEntry.get()
+        sup_Email = self.supplierEmailEntry.get()
+
+        # check if any entry case is empty
+        if (sup_Id =='' or sup_Name  =='' or sup_Agent  =='' or
+            sup_Phone  =='' or sup_Email  =='') :
+            messagebox.showerror("Error","All the entry case must be filled!")
+        # if all the data is correct
+        else:
+            messagebox.askyesno('Confirm', f"Do you want to add New Supplier \n\n\n Id: {sup_Id}\n\n"
+                                           f"Company: {sup_Name} \n\n Agent: {sup_Agent} \n\n Telephone: {sup_Phone} \n\n"
+                                           f"Email: {sup_Email}")
+            supplier_collection.in_newSupplier(
+                sup_Id,sup_Name,sup_Agent,sup_Phone,sup_Email
+            )
+            # this can be used to let know the user that the data of this id have been well inserted. With a messagebox
+            print(supplier_collection.in_newSupplier)
+            if supplier_collection.in_newSupplier:
+                self.supplierIdEntry.delete(0, END)
+                self.supplierNameEntry.delete(0, END)
+                self.supplierAgentEntry.delete(0, END)
+                self.supplierTelephoneEntry.delete(0, END)
+                self.supplierEmailEntry.delete(0, END)
+
+    """Update Supplier Agent, Telephone or/and Email . button UPDATE"""
+    def update_supplier(self):
+        sup_Id = self.supplierIdEntry.get()
+        sup_Agent = self.supplierAgentEntry.get()
+        sup_Phone = self.supplierTelephoneEntry.get()
+        sup_Email = self.supplierEmailEntry.get()
+        #supplier ID is mandatory
+        if (sup_Id == "" or sup_Agent == "" or sup_Phone == "" or sup_Email == "") :
+            messagebox.showerror("ERROR", "No empty case in: Supplieer ID, Agent Full name, Telephone and Email  entries" )
+        else:
+            #Confirme the change to update
+            confirmeUpdate = messagebox.askokcancel("Confirmation", f" For the Supplier ID {sup_Id}, the new company details are: \n\n"
+                                                f"Agent: {sup_Agent}\n\n Telephone: {sup_Phone} and\n\n Email: {sup_Email}" )
+            if confirmeUpdate:
+                supplier_collection.updateSupplier(sup_Id,sup_Agent,sup_Phone,sup_Email)
+                #data have been updated
+                messagebox.showinfo('Info', 'Data save ')
+                #After the data have been updated clear the Entry widgets
+                self.supplierIdEntry.delete(0, END)
+                self.supplierNameEntry.delete(0, END)
+                self.supplierAgentEntry.delete(0, END)
+                self.supplierTelephoneEntry.delete(0, END)
+                self.supplierEmailEntry.delete(0, END)
+            else:
+                messagebox.showwarning("Info", f"No change have been made for Suppplier id: {sup_Id}")
+    #Funtion to clear the Entry boxes
+    def clearSupplier(self):
+        self.supplierIdEntry.delete(0, END)
+        self.supplierNameEntry.delete(0, END)
+        self.supplierAgentEntry.delete(0, END)
+        self.supplierTelephoneEntry.delete(0, END)
+        self.supplierEmailEntry.delete(0, END)
+#####################################################################################################################
+
+    ##################################$$$$$$$$$$$$ CLIENTS $$$$$$$$$$$$$$$$#######################################
+    """ When user click on Show button this will display the whole data from inventory_clients TABLE"""
+
+    def showClient(self):
+        # 1- first clear the data in treeview (otherwise the data in treeview will be repeated)
+        for item in self.client_tree.get_children():
+            self.client_tree.delete(item)
+        # 2- fetch data from DB
+        allclients = client_collection.allClients()
+
+        for row in allclients:
+            # 3- INSERTION OF VALUES FROM DB TO TREEVIEEW
+            self.client_tree.insert('', 'end', text=row[0], values=row[0:])
+
+    """Insert new Client. button INSERT"""
+
+    def insertClient(self):
+        # Entries data
+        cli_Id = self.clientIdEntry.get()
+        cli_Name = self.clientNameEntry.get()
+        cli_Agent = self.clientAgentEntry.get()
+        cli_Phone = self.clientTelephoneEntry.get()
+        cli_Email = self.clientEmailEntry.get()     # check if any entry case is empty
+        if (cli_Id == '' or cli_Name == '' or cli_Agent == '' or
+                cli_Phone == '' or cli_Email == ''):
+            messagebox.showerror("Error", "All the entry case must be filled!")
+        # if all the data is correct
+        else:
+            messagebox.askyesno('Confirm', f"Do you want to add New Client \n\n\n Id: {cli_Id}\n\n"
+                                           f"Company: {cli_Name} \n\n Agent: {cli_Agent} \n\n Telephone: {cli_Phone} \n\n"
+                                           f"Email: {cli_Email}")
+            client_collection.in_newClient(
+                cli_Id, cli_Name, cli_Agent, cli_Phone, cli_Email
+            )
+            # this can be used to let know the user that the data of this id have been well inserted. With a messagebox
+            print(client_collection.in_newClient)
+            if client_collection.in_newClient:
+                # data have been inserted
+                messagebox.showinfo('Info', 'Data save ')
+                # After the data have been inserted clear the Entry widgets
+                self.clientIdEntry.delete(0, END)
+                self.clientNameEntry.delete(0, END)
+                self.clientAgentEntry.delete(0, END)
+                self.clientTelephoneEntry.delete(0, END)
+                self.clientEmailEntry.delete(0, END)
+
+    """Update Client Agent, Telephone or/and Email . button UPDATE"""
+
+    def update_client(self):
+        cli_Id = self.clientIdEntry.get()
+        cli_Name = self.clientNameEntry.get()
+        cli_Agent = self.clientAgentEntry.get()
+        cli_Phone = self.clientTelephoneEntry.get()
+        cli_Email = self.clientEmailEntry.get()
+        # supplier ID is mandatory
+        if (cli_Id == "" or cli_Agent == "" or cli_Phone == "" or cli_Email == ""):
+            messagebox.showerror("ERROR","No empty case in: Client ID, Agent Full name, Telephone and Email  entries")
+        else:
+            # Confirme the change to update
+            confirmeUpdate = messagebox.askokcancel("Confirmation",
+                                                    f" For the Client ID {cli_Id}, the new company details are: \n\n"
+                                                    f"Agent: {cli_Agent}\n\n Telephone: {cli_Phone} and\n\n Email: {cli_Email}")
+            if confirmeUpdate:
+                client_collection.updateClient(cli_Id, cli_Agent, cli_Phone, cli_Email)
+                # data have been updated
+                messagebox.showinfo('Info', 'Data save ')
+                # After the data have been updated clear the Entry widgets
+
+                self.clientIdEntry.delete(0, END)
+                self.clientNameEntry.delete(0, END)
+                self.clientAgentEntry.delete(0, END)
+                self.clientTelephoneEntry.delete(0, END)
+                self.clientEmailEntry.delete(0, END)
+            else:
+                messagebox.showwarning("Info", f"No change have been made for Client id: {cli_Id}")
+
+    #################################################################################################################
+
+#######################################$$$$$$$$$$$$$  USER   $$$$$$$$$$$$$$$$$########################################
     """User data operation"""
     #User INSERT data
     def insert_user_data(self):
         Name = self.userNameEntry.get()
         LastName = self.userLastNameEntry.get()
         Email = self.userEmailEntry.get()
-        Admin = self.cb_Admin.get() ###To change
-        print(Admin)
-        print('en incert data')
-        """Before INSERT data into the database this is a message to confirme the entered data"""
-        confirmation = messagebox.askyesno("Confirmation", f"the new User is : {Name} {LastName}\n {Email}?")
-        """If the data is correct the data will be insert into _users table and will return the id number of the user """
-        """if the user click 'NO' the data in the entries case will be deleted and the user will rewrite thier data"""
-        if confirmation == False:
-            print('cofirmacion falsa')
-            Name.delete(0, END) #self.userNameEntry.delete(0, END)
-            LastName.delete(0, END)#self.userLastNameEntry.delete(0, END)
-            Email.delete(0, END) # self.userEmailEntry.delete(0, END)
+        # Admin = self.cb_Admin.get() ###To change
+        # print(Admin)
+        '''Check that all the necessary cases contains data'''
+        if Name=='' or LastName =='' or Email=='' :
+            messagebox.showerror('Error!', "Name, Lastname and Email must be entered")
         else:
-            # Data colleted and insert
-            print('else')
-            collection.user_data_collection(
-                Name.lower(), LastName.lower(),Email
-            )
-            # return of the user id number
-            messagebox.showinfo(f"Your user ID: {str(collection.last_insert_id)}",
-                                f"Welcome to Inventory {Name} {LastName} this is your User ID: {str(collection.last_insert_id)}. \n This number is your ID and is necessary to use")
-            print('ultimo mensaje')
-            if True:
-                print('now deleted data')
-                self.userNameEntry.delete(0, END)
-                self.userLastNameEntry.delete(0, END)
-                self.userEmailEntry.delete(0, END)
+            print('en incert data')
+            """Before INSERT data into the database this is a message to confirme the entered data"""
+            confirmation = messagebox.askyesno("Confirmation", f"the new User is : {Name} {LastName}\n {Email}?")
+            """If the data is correct the data will be insert into _users table and will return the id number of the user """
+            """if the user click 'NO' the data in the entries case will be deleted and the user will rewrite thier data"""
+            if confirmation == False:
+                print('cofirmacion falsa')
+                Name.delete(0, END) #self.userNameEntry.delete(0, END)
+                LastName.delete(0, END)#self.userLastNameEntry.delete(0, END)
+                Email.delete(0, END) # self.userEmailEntry.delete(0, END)
+            else:
+                # Data colleted and insert
+                print('else')
+                user_collection.user_data_collection(
+                    Name.lower(), LastName.lower(),Email
+                )
+                # return of the user id number
+                messagebox.showinfo(f"Your user ID: {str(user_collection.last_insert_id)}",
+                                    f"Welcome to Inventory {Name} {LastName} this is your User ID: {str(user_collection.last_insert_id)}. \n This number is your ID and is necessary to use")
+                print('ultimo mensaje')
+                if True:
+                    print('now deleted data')
+                    self.userNameEntry.delete(0, END)
+                    self.userLastNameEntry.delete(0, END)
+                    self.userEmailEntry.delete(0, END)
 
-            # User UPDATE data
+            # User UPDATE data   THIS CODE  IS NOT WORKING
     def userUpdate(self):
-      pass
+        idUser = self.userIdEntry.get()
+        Email = self.userEmailEntry.get()
+        print(idUser)
+        print(Email)
+        # check is the case id and email are fill. Only email can be updated in user DB
+        if idUser == ''  or Email == '':
+            messagebox.showerror('Opp! Error Update', 'For Update User "email", ID and email case must be filled! ')
+        else:
+            print("A confirmar")
+            # messsage to confirme with the user if the data to Update is correct
+            confirmation = messagebox.askyesno(
+                "User Update", f"For User ID: {idUser} Do you wan to update the email to: {Email}   ")
+            if confirmation :
+
+                user_collection.updateUser(id=idUser, email=Email)
+                if True:
+                    messagebox.showinfo('Message', f'User email is Updated')
+                    self.userNameEntry.delete(0,END)
+                    self.userEmailEntry.delete(0, END)
+                else:
+                    messagebox.showerror('Ops!', "Error, the User email hasn't been updated")
+    # User Tab, Show button - update Treeview
+    def show(self):
+        #1- first clear the data in treeview (otherwise the data in treeview will be repeated)
+        for item in self.user_tree.get_children():
+            self.user_tree.delete(item)
+        #2- fetch data from DB
+        allusers = user_collection.userAll()
+
+        for row in allusers:
+            #3- INSERTION OF VALUES FROM DB TO TREEVIEEW
+            self.user_tree.insert('', 'end', text=row[0], values=row[0:])
+#######################################################################################################
 #######################################$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$########################################
     def __init__(self,root,*args):
         print('__init__')
@@ -95,7 +290,7 @@ class SecondWindow:
         BillingTreeview = ttk.Frame(BillingFrame)
         BillingTreeview.pack(side=tkinter.RIGHT)
         ###### TEST For Labels at the top of the treevieww to render information#########
-        lb_title = ttk.Label(BillingTopTab, text='Itemfgsf Name')
+        lb_title = ttk.Label(BillingTopTab, text='User ID selected : ')
         lb_title.pack()
         lb_title = ttk.Label(BillingTopTab, text='Itemfgsf ')
         lb_title.pack(side=tkinter.RIGHT, padx=10)
@@ -306,13 +501,23 @@ class SecondWindow:
         self.itemLocationEntry.pack()
 
         ###BUTTONS
-        btn_InsertItem = ttk.Button(itemTab, text="Insert")
-        btn_InsertItem.pack()
-        btn_UpdateItem = ttk.Button(itemTab, text="Update")
-        btn_UpdateItem.pack(side=tkinter.RIGHT)
-        btn_ItemShow = ttk.Button(itemTab, text="Show")
-        btn_ItemShow.pack()
-
+        # Insert button
+        btn_InsertItem = ttk.Button(itemTab, text="Insert", command=lambda: self.insertItem())
+        btn_InsertItem.pack(side=tkinter.TOP)
+        btn_InsertItem.bind("<Return>", lambda event: self.insertItem()(btn_InsertItem["Insert"]))
+        # Update button
+        btn_UpdateItem = ttk.Button(itemTab, text="Update", command=lambda: self.update_Item())
+        btn_UpdateItem.pack(side=tkinter.TOP)
+        btn_UpdateItem.bind("<Return>", lambda event: self.update_Item()(btn_UpdateItem["Update"]))
+        # Show button
+        btn_ItemShow = ttk.Button(itemTab, text="Show", command=lambda: self.showItem())
+        btn_ItemShow.pack(side=tkinter.LEFT)
+        btn_ItemShow.bind("<Return>", lambda event: self.showSupplier()(btn_InsertItem["Show"]))
+        # Clear button
+        btn_ItemClear = ttk.Button(itemTab, text="Clear", command=lambda: self.clearItem())
+        btn_ItemClear.pack()
+        btn_ItemClear.bind("<Return>", lambda event: self.clearItem()(btn_ItemClear["Clear"]))
+        # END
         self.notebook.add(itemFrame, text="Items")
 
 
@@ -333,49 +538,104 @@ class SecondWindow:
         supplierTreeview = ttk.Frame(supplierFrame)
         supplierTreeview.pack(side=tkinter.RIGHT)
         ###### TEST For Labels at the top of the treevieww to render information#########
-        lb_title = ttk.Label(supplierTopTab, text='Itemfgsf Name')
+
+        lb_title = ttk.Label(supplierTopTab, text='Selection:', font=('',16,'bold'))
         lb_title.pack()
-        lb_title = ttk.Label(supplierTopTab, text='Itemfgsf ')
-        lb_title.pack(side=tkinter.RIGHT, padx=10)
-        lb_title = ttk.Label(supplierTopTab, text=' Name')
-        lb_title.pack(side=tkinter.LEFT, padx=10)
-        lb_title = ttk.Label(supplierTopTab, text='Item Name')
-        lb_title.pack(padx=10)
+        lb_1Title = ttk.Label(supplierTopTab, text='Id: ', font=('',12,'bold'))
+        lb_1Title.pack(side=tkinter.LEFT )
+        lb_titleSupId = ttk.Label(supplierTopTab, text='', background='white', font=('',14,'bold'))
+        lb_titleSupId.pack(side=tkinter.LEFT )
+        lb_2Title = ttk.Label(supplierTopTab, text='     Name:', font=('',12,'bold'))
+        lb_2Title.pack(side=tkinter.LEFT)
+        lb_titleSupName = ttk.Label(supplierTopTab, text='',background='white')
+        lb_titleSupName.pack(side=tkinter.LEFT)
+        lb_3Title = ttk.Label(supplierTopTab, text='     Agent:', font=('',12,'bold'))
+        lb_3Title.pack(side=tkinter.LEFT)
+        lb_titleSupAgent = ttk.Label(supplierTopTab, text='',background='white')
+        lb_titleSupAgent.pack(side=tkinter.LEFT)
+        lb_4Title = ttk.Label(supplierTopTab, text='     Telephone:', font=('',12,'bold'))
+        lb_4Title.pack(side=tkinter.LEFT)
+        lb_titleSupPhone = ttk.Label(supplierTopTab, text='',background='white')
+        lb_titleSupPhone.pack(side=tkinter.LEFT)
+        lb_4Title = ttk.Label(supplierTopTab, text='     Email:', font=('', 12, 'bold'))
+        lb_4Title.pack(side=tkinter.LEFT)
+        lb_titleSupEmail = ttk.Label(supplierTopTab, text='', background='white')
+        lb_titleSupEmail.pack(side=tkinter.LEFT)
         #####################################################
-        ###############test insert in treeview
-        lis = []
-        for i in range(1, 50):
-            suplist = (
-            25*i, f"Company {i}", f"Name {i}", i*45, f"email{i}")
-            lis.append(suplist)
-        print(lis)
-        # supplier_tree.insert('','end', text=itemlist[0], values=itemlist[0:])
+
+
         ######################## ITEM TREEVIEW
 
-        supplier_tree = ttk.Treeview(supplierTreeview, height=18, columns=(
+        self.supplier_tree = ttk.Treeview(supplierTreeview, height=18, columns=(
          "Supplier ID", "Company Name", "Agent", "Telephone", "Email"), show="headings")
-        supplier_tree.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
-        # supplier_tree.insert('', 'end', text=itemlist[0], values=lis[0:])   # Insert data into the treeview
-        for row in lis:
-            supplier_tree.insert('', 'end', values=row)  # test Insert data into the treeview
+        self.supplier_tree.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
+        """Display in the treeview all the data from the inventory_suppliers TABLE """
+        # fetch data from DB
+        allsuppliers = supplier_collection.allSuppliers()
+
+        for row in allsuppliers:
+            # - INSERTION OF VALUES FROM DB TO TREEVIEEW
+            self.supplier_tree.insert('', 'end', text=row[0], values=row[0:])
         # Scrollbar for the treeview
-        supplier_tree_scroll = ttk.Scrollbar(supplierTreeview, orient="vertical", command=supplier_tree.yview)
+        supplier_tree_scroll = ttk.Scrollbar(supplierTreeview, orient="vertical", command=self.supplier_tree.yview)
         supplier_tree_scroll.pack(side=tkinter.LEFT, fill=tkinter.Y)
-        supplier_tree.configure(yscrollcommand=supplier_tree_scroll.set)
+        self.supplier_tree.configure(yscrollcommand=supplier_tree_scroll.set)
         ##### Heading of the treeview
-        supplier_tree.heading(0, text="Supplier ID", anchor='center')
-        supplier_tree.heading(1, text="Company Name", anchor='center')
-        supplier_tree.heading(2, text="Agent", anchor='center')
-        supplier_tree.heading(3, text="Telephone", anchor='center')
-        supplier_tree.heading(4, text="Email", anchor='center')
+        self.supplier_tree.heading(0, text="Supplier ID", anchor='center')
+        self.supplier_tree.heading(1, text="Company Name", anchor='center')
+        self.supplier_tree.heading(2, text="Agent", anchor='center')
+        self.supplier_tree.heading(3, text="Telephone", anchor='center')
+        self.supplier_tree.heading(4, text="Email", anchor='center')
 
         ##### Columns of the treeview
-        supplier_tree.column(0, width=150, anchor='center')
-        supplier_tree.column(1, width=300, anchor='center')
-        supplier_tree.column(2, width=300, anchor='center')
-        supplier_tree.column(3, width=100, anchor='center')
-        supplier_tree.column(4, width=250, anchor='center')
+        self.supplier_tree.column(0, width=150, anchor='center')
+        self.supplier_tree.column(1, width=300, anchor='center')
+        self.supplier_tree.column(2, width=300, anchor='center')
+        self.supplier_tree.column(3, width=100, anchor='center')
+        self.supplier_tree.column(4, width=250, anchor='center')
+        ####Select items from the treeview###
+        ######################################
+        """this methods is to select,fetch and return data from the clicked row in the treeview """
 
+        def treeview_select(event):
+            # FETCH SELECTED ROW
+            select_SupplierId = event.widget.selection()[0]
+            # FETCH ALL VALUES OF THE ROW
+            select_SupplierIdValue = event.widget.item(select_SupplierId)['values']
+            """Configuration of the labes at the topframe. When the user clicks one of the row in the treeview the data 
+            from the clicked row will be display at the top. thE VALUE ARE INDEXED"""
+
+            """Rendering the selected row in the treeview into the Entry widgets"""
+            # Supplier ID
+            self.supplierIdEntry.delete(0, END)
+            self.supplierIdEntry.insert(0, select_SupplierIdValue[0])
+            # SUPPLIER NAME
+            self.supplierNameEntry.delete(0, END)
+            self.supplierNameEntry.insert(0, select_SupplierIdValue[1])
+            # AGENT SUPPLIER
+            self.supplierAgentEntry.delete(0, END)
+            self.supplierAgentEntry.insert(0, select_SupplierIdValue[2])
+            # SUPPLIER PHONE
+            self.supplierTelephoneEntry.delete(0, END)
+            self.supplierTelephoneEntry.insert(0, select_SupplierIdValue[3])
+            # SUPPLIER EMAIL
+            self.supplierEmailEntry.delete(0, END)
+            self.supplierEmailEntry.insert(0, select_SupplierIdValue[4])
+            """Render selected row in the treeviw at the TopFrame"""
+            #Supplier ID
+            lb_titleSupId.config(text=select_SupplierIdValue[0])
+            #Supplier Name
+            lb_titleSupName.config(text=select_SupplierIdValue[1])
+            #Supplier Agent
+            lb_titleSupAgent.config(text=select_SupplierIdValue[2])
+            #Supplier Phone
+            lb_titleSupPhone.config(text=select_SupplierIdValue[3])
+            #Supplier Email
+            lb_titleSupEmail.config(text=select_SupplierIdValue[4])
+            return select_SupplierIdValue
+
+        self.supplier_tree.bind('<<TreeviewSelect>>', treeview_select)
+        #######################################################
 
         ################################# SUPPLIERS TAB, LABELS AND ENTRIES
 
@@ -401,12 +661,23 @@ class SecondWindow:
         self.supplierEmailEntry.pack()
 
         ###BUTTONS
-        btn_InsertSupplier = ttk.Button(supplierTab, text="Insert", command="")
-        btn_InsertSupplier.pack()
-        btn_UpdateSupplier = ttk.Button(supplierTab, text="Update", command="")
-        btn_UpdateSupplier.pack(side=tkinter.RIGHT)
-        btn_SupplierShow = ttk.Button(supplierTab, text="Show", command="")
-        btn_SupplierShow.pack()
+        #Insert button
+        btn_InsertSupplier = ttk.Button(supplierTab, text="Insert", command=lambda : self.insertSupplier())
+        btn_InsertSupplier.pack(side=tkinter.TOP)
+        btn_InsertSupplier.bind("<Return>", lambda event: self.insertSupplier()(btn_InsertSupplier["Insert"]))
+        #Update button
+        btn_UpdateSupplier = ttk.Button(supplierTab, text="Update", command=lambda : self.update_supplier())
+        btn_UpdateSupplier.pack(side=tkinter.TOP)
+        btn_UpdateSupplier.bind("<Return>", lambda event: self.update_supplier()(btn_UpdateSupplier["Update"]))
+        #Show button
+        btn_SupplierShow = ttk.Button(supplierTab, text="Show", command= lambda : self.showSupplier())
+        btn_SupplierShow.pack(side=tkinter.LEFT)
+        btn_SupplierShow.bind("<Return>", lambda event: self.showSupplier()(btn_InsertSupplier["Show"]))
+        #Clear button
+        btn_SupplierClear = ttk.Button(supplierTab, text="Clear", command=lambda: self.clearSupplier())
+        btn_SupplierClear.pack()
+        btn_SupplierClear.bind("<Return>", lambda event: self.clearSupplier()(btn_SupplierClear["Clear"]))
+        #END
         self.notebook.add(supplierFrame, text="Supplier")
 #######################################################################
         """CLIENT"""
@@ -423,80 +694,134 @@ class SecondWindow:
         clientTreeview = ttk.Frame(clientFrame)
         clientTreeview.pack(side=tkinter.RIGHT)
         ###### TEST For Labels at the top of the treevieww to render information#########
-        lb_title = ttk.Label(clientTopTab, text='Itemfgsf Name')
+        lb_title = ttk.Label(clientTopTab, text='Selection:', font=('', 16, 'bold'))
         lb_title.pack()
-        lb_title = ttk.Label(clientTopTab, text='Itemfgsf ')
-        lb_title.pack(side=tkinter.RIGHT, padx=10)
-        lb_title = ttk.Label(clientTopTab, text=' Name')
-        lb_title.pack(side=tkinter.LEFT, padx=10)
-        lb_title = ttk.Label(clientTopTab, text='Item Name')
-        lb_title.pack(padx=10)
+        lb_1Title = ttk.Label(clientTopTab, text='Id: ', font=('', 12, 'bold'))
+        lb_1Title.pack(side=tkinter.LEFT)
+        lb_titleCliId = ttk.Label(clientTopTab, text='', background='white', font=('', 14, 'bold'))
+        lb_titleCliId.pack(side=tkinter.LEFT)
+        lb_2Title = ttk.Label(clientTopTab, text='     Name:', font=('', 12, 'bold'))
+        lb_2Title.pack(side=tkinter.LEFT)
+        lb_titleCliName = ttk.Label(clientTopTab, text='', background='white')
+        lb_titleCliName.pack(side=tkinter.LEFT)
+        lb_3Title = ttk.Label(clientTopTab, text='     Agent:', font=('', 12, 'bold'))
+        lb_3Title.pack(side=tkinter.LEFT)
+        lb_titleCliAgent = ttk.Label(clientTopTab, text='', background='white')
+        lb_titleCliAgent.pack(side=tkinter.LEFT)
+        lb_4Title = ttk.Label(clientTopTab, text='     Telephone:', font=('', 12, 'bold'))
+        lb_4Title.pack(side=tkinter.LEFT)
+        lb_titleCliPhone = ttk.Label(clientTopTab, text='', background='white')
+        lb_titleCliPhone.pack(side=tkinter.LEFT)
+        lb_4Title = ttk.Label(clientTopTab, text='     Email:', font=('', 12, 'bold'))
+        lb_4Title.pack(side=tkinter.LEFT)
+        lb_titleCliEmail = ttk.Label(clientTopTab, text='', background='white')
+        lb_titleCliEmail.pack(side=tkinter.LEFT)
         #####################################################
-        ###############test insert in treeview
-        lis = []
-        for i in range(1, 50):
-            suplist = (
-            25*i, f"Company {i}", f"Name {i}", i*45, f"email{i}")
-            lis.append(suplist)
-        print(lis)
-        # client_tree.insert('','end', text=itemlist[0], values=itemlist[0:])
+
         ######################## ITEM TREEVIEW
 
-        client_tree = ttk.Treeview(clientTreeview, height=18, columns=(
+        self.client_tree = ttk.Treeview(clientTreeview, height=18, columns=(
          "Client ID", "Company Name", "Agent", "Telephone", "Email"), show="headings")
-        client_tree.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
-        # client_tree.insert('', 'end', text=itemlist[0], values=lis[0:])   # Insert data into the treeview
-        for row in lis:
-            client_tree.insert('', 'end', values=row)  # test Insert data into the treeview
+        self.client_tree.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
+        """Display in the treeview all the data from the inventory_suppliers TABLE """
+        # fetch data from DB
+        allclients = client_collection.allClients()
+
+        for row in allclients:
+            # - INSERTION OF VALUES FROM DB TO TREEVIEEW
+            self.client_tree.insert('', 'end', text=row[0], values=row[0:])
         # Scrollbar for the treeview
-        client_tree_scroll = ttk.Scrollbar(clientTreeview, orient="vertical", command=client_tree.yview)
+        client_tree_scroll = ttk.Scrollbar(clientTreeview, orient="vertical", command=self.client_tree.yview)
         client_tree_scroll.pack(side=tkinter.LEFT, fill=tkinter.Y)
-        client_tree.configure(yscrollcommand=client_tree_scroll.set)
+        self.client_tree.configure(yscrollcommand=client_tree_scroll.set)
         ##### Heading of the treeview
-        client_tree.heading(0, text="Client ID", anchor='center')
-        client_tree.heading(1, text="Company Name", anchor='center')
-        client_tree.heading(2, text="Agent", anchor='center')
-        client_tree.heading(3, text="Telephone", anchor='center')
-        client_tree.heading(4, text="Email", anchor='center')
+        self.client_tree.heading(0, text="Client ID", anchor='center')
+        self.client_tree.heading(1, text="Company Name", anchor='center')
+        self.client_tree.heading(2, text="Agent", anchor='center')
+        self.client_tree.heading(3, text="Telephone", anchor='center')
+        self.client_tree.heading(4, text="Email", anchor='center')
 
         ##### Columns of the treeview
-        client_tree.column(0, width=150, anchor='center')
-        client_tree.column(1, width=300, anchor='center')
-        client_tree.column(2, width=300, anchor='center')
-        client_tree.column(3, width=100, anchor='center')
-        client_tree.column(4, width=250, anchor='center')
+        self.client_tree.column(0, width=150, anchor='center')
+        self.client_tree.column(1, width=300, anchor='center')
+        self.client_tree.column(2, width=300, anchor='center')
+        self.client_tree.column(3, width=100, anchor='center')
+        self.client_tree.column(4, width=250, anchor='center')
 
+        ####Select items from the treeview###
+        ######################################
+        """this methods is to select,fetch and return data from the clicked row in the treeview """
+
+        def treeview_select(event):
+            # FETCH SELECTED ROW
+            select_ClientId = event.widget.selection()[0]
+            # FETCH ALL VALUES OF THE ROW
+            select_ClientIdValue = event.widget.item(select_ClientId)['values']
+            """Configuration of the labes at the topframe. When the user clicks one of the row in the treeview the data 
+            from the clicked row will be display at the top. thE VALUE ARE INDEXED"""
+
+            """Rendering the selected row in the treeview into the Entry widgets"""
+            # CLIENT ID
+            self.clientIdEntry.delete(0, END)
+            self.clientIdEntry.insert(0, select_ClientIdValue[0])
+            # CLIENT NAME
+            self.clientNameEntry.delete(0, END)
+            self.clientNameEntry.insert(0, select_ClientIdValue[1])
+            # AGENT CLIENT
+            self.clientAgentEntry.delete(0, END)
+            self.clientAgentEntry.insert(0, select_ClientIdValue[2])
+            # CLIENT PHONE
+            self.clientTelephoneEntry.delete(0, END)
+            self.clientTelephoneEntry.insert(0, select_ClientIdValue[3])
+            # CLIENT EMAIL
+            self.clientEmailEntry.delete(0, END)
+            self.clientEmailEntry.insert(0, select_ClientIdValue[4])
+            """Render selected row in the treeviw at the TopFrame"""
+            # Client ID
+            lb_titleCliId.config(text=select_ClientIdValue[0])
+            # Client Name
+            lb_titleCliName.config(text=select_ClientIdValue[1])
+            # Client Agent
+            lb_titleCliAgent.config(text=select_ClientIdValue[2])
+            # Client Phone
+            lb_titleCliPhone.config(text=select_ClientIdValue[3])
+            # Client Email
+            lb_titleCliEmail.config(text=select_ClientIdValue[4])
+            return select_ClientIdValue
+
+        self.client_tree.bind('<<TreeviewSelect>>', treeview_select)
+        #######################################################
 
         ################################# CLIENTS TAB, LABELS AND ENTRIES
 
-        lb_SupplierId = ttk.Label(clientTab, text="Supplier ID:")
-        lb_SupplierId.pack()
+        lb_ClientId = ttk.Label(clientTab, text="Supplier ID:")
+        lb_ClientId.pack()
         self.clientIdEntry = ttk.Entry(clientTab)
         self.clientIdEntry.pack()
-        lb_SupplierName = ttk.Label(clientTab, text="Company Name:")
-        lb_SupplierName.pack()
+        lb_ClientName = ttk.Label(clientTab, text="Company Name:")
+        lb_ClientName.pack()
         self.clientNameEntry = ttk.Entry(clientTab)
         self.clientNameEntry.pack()
-        lb_SupplierAgent = ttk.Label(clientTab, text="Agent Full Name:")
-        lb_SupplierAgent.pack()
+        lb_ClientAgent = ttk.Label(clientTab, text="Agent Full Name:")
+        lb_ClientAgent.pack()
         self.clientAgentEntry = ttk.Entry(clientTab)
         self.clientAgentEntry.pack()
-        lb_SupplierTelephone = ttk.Label(clientTab, text="Telephone:")
-        lb_SupplierTelephone.pack()
+        lb_ClientTelephone = ttk.Label(clientTab, text="Telephone:")
+        lb_ClientTelephone.pack()
         self.clientTelephoneEntry = ttk.Entry(clientTab)
         self.clientTelephoneEntry.pack()
-        lb_SupplierEmail = ttk.Label(clientTab, text="Email:")
-        lb_SupplierEmail.pack()
+        lb_ClientEmail = ttk.Label(clientTab, text="Email:")
+        lb_ClientEmail.pack()
         self.clientEmailEntry = ttk.Entry(clientTab)
         self.clientEmailEntry.pack()
 
         ###BUTTONS
-        btn_InsertSupplier = ttk.Button(clientTab, text="Insert", command="")
-        btn_InsertSupplier.pack()
-        btn_UpdateSupplier = ttk.Button(clientTab, text="Update", command="")
-        btn_UpdateSupplier.pack(side=tkinter.RIGHT)
-        btn_SupplierShow = ttk.Button(clientTab, text="Show", command="")
-        btn_SupplierShow.pack()
+        btn_InsertClient = ttk.Button(clientTab, text="Insert", command=lambda : self.insertClient())
+        btn_InsertClient.pack()
+        btn_UpdateClient = ttk.Button(clientTab, text="Update", command=lambda : self.update_client())
+        btn_UpdateClient.pack(side=tkinter.RIGHT)
+        btn_ClientShow = ttk.Button(clientTab, text="Show", command=lambda : self.showClient())
+        btn_ClientShow.pack()
         self.notebook.add(clientFrame, text="Client")
 
 ###############################################################
@@ -514,50 +839,83 @@ class SecondWindow:
         userTreeview = ttk.Frame(userFrame)
         userTreeview.pack(side=tkinter.RIGHT)
         ###### TEST For Labels at the top of the treevieww to render information#########
-        lb_title = ttk.Label(userTopTab, text='Itemfgsf Name')
-        lb_title.pack()
-        lb_title = ttk.Label(userTopTab, text='Itemfgsf ')
-        lb_title.pack(side=tkinter.RIGHT, padx=10)
-        lb_title = ttk.Label(userTopTab, text=' Name')
-        lb_title.pack(side=tkinter.LEFT, padx=10)
-        lb_title = ttk.Label(userTopTab, text='Item Name')
-        lb_title.pack(padx=10)
-        #####################################################
-        ###############test insert in treeview
-        lis = []
-        for i in range(1, 50):
-            suplist = (
-                 i, f"Name {i}", f"Last Name {i}",f"email{i}")
-            lis.append(suplist)
-        print(lis)
-        # user_tree.insert('','end', text=itemlist[0], values=itemlist[0:])
-        ######################## ITEM TREEVIEW
 
-        user_tree = ttk.Treeview(userTreeview, height=18, columns=(
+        lb_title = ttk.Label(userTopTab, text='Selection:', font=('',16,'bold'))
+        lb_title.pack()
+        lb_1Title = ttk.Label(userTopTab, text='User Id: ', font=('',12,'bold'))
+        lb_1Title.pack(side=tkinter.LEFT )
+        lb_titleUser = ttk.Label(userTopTab, text='', background='white', font=('',14,'bold'))
+        lb_titleUser.pack(side=tkinter.LEFT )
+        lb_2Title = ttk.Label(userTopTab, text='     Name:', font=('',12,'bold'))
+        lb_2Title.pack(side=tkinter.LEFT)
+        lb_titleName = ttk.Label(userTopTab, text='',background='white')
+        lb_titleName.pack(side=tkinter.LEFT)
+        lb_3Title = ttk.Label(userTopTab, text='     Lastname:', font=('',12,'bold'))
+        lb_3Title.pack(side=tkinter.LEFT)
+        lb_titleLastName = ttk.Label(userTopTab, text='',background='white')
+        lb_titleLastName.pack(side=tkinter.LEFT)
+        lb_4Title = ttk.Label(userTopTab, text='     Email:', font=('',12,'bold'))
+        lb_4Title.pack(side=tkinter.LEFT)
+        lb_titleEmail = ttk.Label(userTopTab, text='',background='white')
+        lb_titleEmail.pack(side=tkinter.LEFT)
+
+        #####################################################
+
+        ######################## USER TREEVIEW
+
+        self.user_tree = ttk.Treeview(userTreeview, height=18, columns=(
             "User ID", "Name", "Last Name", "Email"), show="headings")
-        user_tree.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
-        # user_tree.insert('', 'end', text=itemlist[0], values=lis[0:])   # Insert data into the treeview
-        for row in lis:
-            user_tree.insert('', 'end', values=row)  # test Insert data into the treeview
-        # Scrollbar for the treeview
-        user_tree_scroll = ttk.Scrollbar(userTreeview, orient="vertical", command=user_tree.yview)
+        self.user_tree.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
+
+        """Display in the treeview all the data from the _users TABLE """
+        allusers = user_collection.userAll()
+        for row in allusers:
+
+            # INSERTION OF VALUES FROM DB TO TREEVIEEW
+            self.user_tree.insert('', 'end', text=row[0], values=row[0:])   # Insert data into the treeview
+        ##############################SCROLL BAR ###########################
+        user_tree_scroll = ttk.Scrollbar(userTreeview, orient="vertical", command=self.user_tree.yview)
         user_tree_scroll.pack(side=tkinter.LEFT, fill=tkinter.Y)
-        user_tree.configure(yscrollcommand=user_tree_scroll.set)
+        self.user_tree.configure(yscrollcommand=user_tree_scroll.set)
         ##### Heading of the treeview
-        user_tree.heading(0, text="User ID", anchor='center')
-        user_tree.heading(1, text="Name", anchor='center')
-        user_tree.heading(2, text="Last Name", anchor='center')
-        user_tree.heading(3, text="Email", anchor='center')
+        self.user_tree.heading(0, text="User ID", anchor='center')
+        self.user_tree.heading(1, text="Name", anchor='center')
+        self.user_tree.heading(2, text="Last Name", anchor='center')
+        self.user_tree.heading(3, text="Email", anchor='center')
 
         ##### Columns of the treeview
-        user_tree.column(0, width=150, anchor='center')
-        user_tree.column(1, width=300, anchor='center')
-        user_tree.column(2, width=300, anchor='center')
-        user_tree.column(3, width=350, anchor='center')
+        self.user_tree.column(0, width=150, anchor='center')
+        self.user_tree.column(1, width=300, anchor='center')
+        self.user_tree.column(2, width=300, anchor='center')
+        self.user_tree.column(3, width=350, anchor='center')
+        ####################################
+        ####Select items from the treeview###
+        ######################################
+        """this methods is to select,fetch and return data from the clicked row in the treeview """
+        def treeview_select(event):
+            # FETCH SELECTED ROW
+            select_userId = event.widget.selection()[0]
+            # FETCH ALL VALUES OF THE ROW
+            select_userIdValue = event.widget.item(select_userId)['values']
+            """Configuration of the labes at the topframe. When the user clicks one of the row in the treeview the data 
+            from the clicked row will be display at the top. thE VALUE ARE INDEXED"""
+            #USER ID
+            lb_titleUser.config(text= select_userIdValue[0] )
+            # USER NAME
+            lb_titleName.config(text= select_userIdValue[1] )
+            #USER LASTNAME
+            lb_titleLastName.config(text= select_userIdValue[2] )
+            #USER EMAIL
+            lb_titleEmail.config(text=select_userIdValue[3])
 
-
-        ################################# CLIENTS TAB, LABELS AND ENTRIES
-
+            return select_userIdValue
+        self.user_tree.bind('<<TreeviewSelect>>', treeview_select)
+        #######################################################
+        ################################# USER TAB, LABELS AND ENTRIES
+        lb_UserId = ttk.Label(userTab, text="ID:")
+        lb_UserId.pack()
+        self.userIdEntry = ttk.Entry(userTab)
+        self.userIdEntry.pack()
         lb_UserName = ttk.Label(userTab, text="Name:")
         lb_UserName.pack()
         self.userNameEntry = ttk.Entry(userTab)
@@ -571,14 +929,17 @@ class SecondWindow:
         self.userEmailEntry = ttk.Entry(userTab)
         self.userEmailEntry.pack()
 
-
         ###BUTTONS
-        btn_InsertUser = ttk.Button(userTab, text="Insert", command="")
+        # Insert data into the DB
+        btn_InsertUser = ttk.Button(userTab, text="Insert", command=lambda : self.insert_user_data())
         btn_InsertUser.pack()
-        btn_UpdateUser = ttk.Button(userTab, text="Update", command="")
+        # Update a particular row
+        btn_UpdateUser = ttk.Button(userTab, text="Update", command=lambda : self.userUpdate())
         btn_UpdateUser.pack(side=tkinter.RIGHT)
-        btn_UserShow = ttk.Button(userTab, text="Show", command="")
+        # Refresh data display in treeview
+        btn_UserShow = ttk.Button(userTab, text="Show", command=lambda : self.show())
         btn_UserShow.pack()
+        ######
         self.notebook.add(userFrame, text="User")
 
 ###########################################################################
@@ -592,11 +953,7 @@ class SecondWindow:
 
         # Notebook Widget
 
-        # self.notebook.add(frameBilling, text = "Billing" )
-        # self.notebook.add(frameItem, text = "Items")
-        # self.notebook.add(frameSupplier, text = "Supplier")
-        # self.notebook.add(frameClient, text = "Client")
-        # self.notebook.add(frameUser, text = "User" )
+
         self.notebook.add(frameSearch, text = "Search", state="disabled")# $Note: $to improuve that depending and the user
         # notebook widget can be 'disabled', 'normal' 'hidden' $ maybe  with boolean in _user TABLE can be add it and
         # depending on True  or False some widget can be used by the user.
